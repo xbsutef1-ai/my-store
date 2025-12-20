@@ -1,39 +1,45 @@
 <!DOCTYPE html>
-<html>
+<html lang="ar">
 <head>
+  <meta charset="UTF-8">
   <title>My Invoices - GLOM Store</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="theme.css">
 </head>
 <body>
 
-<div class="container">
-  <h2>فواتيري</h2>
-  <div id="list"></div>
+<div class="auth-wrap">
+  <div class="auth-box">
+    <h2>My Invoices</h2>
+    <div id="list"></div>
+  </div>
 </div>
 
 <script>
-async function loadInvoices() {
-  const res = await fetch("/api/my/invoices", {
-    headers: { authorization: localStorage.token }
-  });
-  const invoices = await res.json();
+const list=document.getElementById("list");
+const token=localStorage.getItem("token");
 
-  list.innerHTML = "";
-  invoices.forEach(i => {
-    list.innerHTML += `
-      <div class="product">
-        <p><b>Invoice:</b> ${i.invoiceId}</p>
-        <p>Amount: ${i.amount} SAR</p>
-        <a href="/invoices/${i.invoiceFile}" target="_blank">
-          تحميل PDF
-        </a>
-      </div>
-    `;
-  });
+if(!token){
+  location.href="/login.html";
 }
-loadInvoices();
-</script>
 
+fetch("/api/my/orders",{headers:{authorization:token}})
+.then(r=>r.json())
+.then(data=>{
+  if(!data.length){
+    list.innerHTML="<p>No invoices yet.</p>";
+    return;
+  }
+  data.forEach(o=>{
+    const d=document.createElement("div");
+    d.style.marginTop="12px";
+    d.innerHTML=`
+      <b>Order:</b> ${o.orderId}<br>
+      <b>Amount:</b> ${o.finalAmount} SAR
+    `;
+    list.appendChild(d);
+  });
+});
+</script>
 </body>
 </html>
-
