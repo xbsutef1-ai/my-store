@@ -93,6 +93,21 @@ app.post("/api/register", async (req, res) => {
 
   res.json({ success: true });
 });
+app.get("/test-email", async (req, res) => {
+  try {
+    await transporter.sendMail({
+      from: `"GLOM Store" <yaghipegusp9@outlook.com>`,
+      to: "yaghipegusp9@outlook.com",
+      subject: "Brevo Test Email",
+      html: "<h2>If you see this, Brevo works ✅</h2>"
+    });
+    res.send("Email sent");
+  } catch (err) {
+    console.error("TEST EMAIL ERROR:", err);
+    res.status(500).send("Failed");
+  }
+});
+
 
 // ================= Resend OTP (NEW) =================
 app.post("/api/resend-code", async (req, res) => {
@@ -166,3 +181,4 @@ app.get("*", (req, res) =>
 );
 
 app.listen(PORT, ()=>console.log("Server running on", PORT));
+
