@@ -1,110 +1,87 @@
 document.addEventListener("DOMContentLoaded", () => {
 
   const productsDiv = document.getElementById("products");
-  const modal = document.getElementById("modal");
-  const priceInfo = document.getElementById("priceInfo");
-  const couponInput = document.getElementById("coupon");
-  const couponMsg = document.getElementById("couponMsg");
-
+  const tabsDiv = document.getElementById("tabs");
   const accountBtn = document.getElementById("accountBtn");
   const accountMenu = document.getElementById("accountMenu");
 
-  let selectedProduct = null;
-  let finalPrice = 0;
   let allProducts = [];
+  let categories = [];
+  let currentCat = "ALL";
 
-  /* ===== Account Dropdown ===== */
+  /* ===== ACCOUNT MENU ===== */
   accountBtn.onclick = () => {
     accountMenu.classList.toggle("hidden");
   };
 
-  window.logout = () => {
-    localStorage.removeItem("token");
-    location.reload();
-  };
+  document.addEventListener("click", e => {
+    if (!accountMenu.contains(e.target) && !accountBtn.contains(e.target)) {
+      accountMenu.classList.add("hidden");
+    }
+  });
 
-  /* ===== Load Products ===== */
-  async function loadProducts() {
-    const res = await fetch("/api/products");
-    const products = await res.json();
-    allProducts = products;
-    renderProducts(products);
+  /* ===== LOAD DATA ===== */
+  async function loadAll() {
+    const [cats, prods] = await Promise.all([
+      fetch("/api/categories").then(r => r.json()),
+      fetch("/api/products").then(r => r.json())
+    ]);
+
+    categories = cats;
+    allProducts = prods;
+
+    renderTabs();
+    renderProducts();
   }
 
-  function renderProducts(list) {
+  /* ===== TABS ===== */
+  function renderTabs() {
+    tabsDiv.innerHTML = "";
+
+    const all = document.createElement("div");
+    all.className = `tab ${currentCat === "ALL" ? "active" : ""}`;
+    all.textContent = "All";
+    all.onclick = () => setCat("ALL");
+    tabsDiv.appendChild(all);
+
+    categories.forEach(c => {
+      const t = document.createElement("div");
+      t.className = `tab ${currentCat === c.slug ? "active" : ""}`;
+      t.textContent = c.name;
+      t.onclick = () => setCat(c.slug);
+      tabsDiv.appendChild(t);
+    });
+  }
+
+  function setCat(slug) {
+    currentCat = slug;
+    renderTabs();
+    renderProducts();
+  }
+
+  /* ===== PRODUCTS ===== */
+  function renderProducts() {
     productsDiv.innerHTML = "";
 
-    if (list.length === 0) {
-      productsDiv.innerHTML = "<p>No products available</p>";
-      return;
+    let list = allProducts;
+    if (currentCat !== "ALL") {
+      list = list.filter(p => p.categorySlug === currentCat);
     }
 
-    list.forEach(p => {
-      const div = document.createElement("div");
-      div.className = "product";
-      div.innerHTML = `
+    list.forEach((p, i) => {
+      const card = document.createElement("div");
+      card.className = "product";
+      card.innerHTML = `
         <h3>${p.name}</h3>
         <p>${p.description || ""}</p>
-        <p><b>${p.price} SAR</b></p>
-        <button class="primary">Buy</button>
+        <div class="price">${p.price} SAR</div>
+        <button class="btn">Buy</button>
       `;
-      div.querySelector("button").onclick = () => openOrder(p);
-      productsDiv.appendChild(div);
+      productsDiv.appendChild(card);
+
+      setTimeout(() => card.classList.add("reveal"), i * 70);
     });
   }
 
-  window.filterCategory = cat => {
-    if (cat === "ALL") renderProducts(allProducts);
-    else renderProducts(allProducts.filter(p => p.category === cat));
-  };
-
-  function openOrder(product) {
-    selectedProduct = product;
-    finalPrice = product.price;
-    priceInfo.innerText = `Price: ${finalPrice} SAR`;
-    couponMsg.innerText = "";
-    couponInput.value = "";
-    modal.classList.remove("hidden");
-  }
-
-  window.applyCoupon = async () => {
-    const code = couponInput.value.trim();
-    if (!code) return;
-
-    const res = await fetch("/api/coupon/validate", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ code, price: selectedProduct.price })
-    });
-
-    const data = await res.json();
-    if (!data.valid) {
-      couponMsg.innerText = "Invalid code";
-      return;
-    }
-
-    finalPrice = data.finalPrice;
-    priceInfo.innerText = `Price after discount: ${finalPrice} SAR`;
-    couponMsg.innerText = "Discount applied";
-  };
-
-  window.confirmOrder = async () => {
-    await fetch("/api/order", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        productId: selectedProduct._id,
-        couponCode: couponInput.value.trim()
-      })
-    });
-
-    alert("Order created successfully");
-    closeModal();
-  };
-
-  window.closeModal = () => {
-    modal.classList.add("hidden");
-  };
-
-  loadProducts();
+  loadAll();
 });
