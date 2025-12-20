@@ -1,3 +1,8 @@
+const productsDiv = document.getElementById("products");
+const modal = document.getElementById("modal");
+const priceInfo = document.getElementById("priceInfo");
+const couponMsg = document.getElementById("couponMsg");
+
 let selectedProduct = null;
 let finalPrice = 0;
 
@@ -66,3 +71,4 @@ function closeModal() {
 }
 
 loadProducts();
+
