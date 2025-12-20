@@ -203,3 +203,32 @@ body{
   text-align:center;
   font-size:13px;
 }
+/* ===== AUTH ANIMATION ===== */
+@keyframes authIn {
+  from {
+    opacity: 0;
+    transform: translateY(40px) scale(.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.auth-wrap{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.auth-box{
+  width:100%;
+  max-width:420px;
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:22px;
+  padding:28px;
+  box-shadow:0 0 50px rgba(182,107,255,.35);
+  animation: authIn .6s ease;
+}
