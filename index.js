@@ -3,7 +3,6 @@ const express = require("express");
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const nodemailer = require("nodemailer");
 const path = require("path");
 
 const app = express();
@@ -16,17 +15,6 @@ app.use(express.static(path.join(__dirname, "public")));
 mongoose.connect(process.env.MONGO_URI)
   .then(()=>console.log("MongoDB connected"))
   .catch(err=>{console.error(err);process.exit(1);});
-
-// ================= Mail (Brevo) =================
-const transporter = nodemailer.createTransport({
-  host: process.env.MAIL_HOST,
-  port: Number(process.env.MAIL_PORT),
-  secure: false,
-  auth: {
-    user: process.env.MAIL_USER, // apikey
-    pass: process.env.MAIL_PASS  // Brevo API key
-  }
-});
 
 // ================= User Schema =================
 const UserSchema = new mongoose.Schema({
@@ -42,6 +30,30 @@ const User = mongoose.model("User", UserSchema);
 // ================= Helpers =================
 function generateOTP() {
   return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
+async function sendEmailBrevo(to, subject, html) {
+  const res = await fetch("https://api.brevo.com/v3/smtp/email", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "api-key": process.env.BREVO_API_KEY
+    },
+    body: JSON.stringify({
+      sender: {
+        name: "GLOM Store",
+        email: "yaghipegusp9@outlook.com"
+      },
+      to: [{ email: to }],
+      subject,
+      htmlContent: html
+    })
+  });
+
+  if (!res.ok) {
+    const t = await res.text();
+    throw new Error("BREVO API ERROR: " + t);
+  }
 }
 
 function emailTemplate(code) {
@@ -64,75 +76,65 @@ function emailTemplate(code) {
 
 // ================= Register =================
 app.post("/api/register", async (req, res) => {
-  const { name, email, password } = req.body;
-  if (!name || !email || !password)
-    return res.status(400).json({ error: "All fields required" });
-
-  const exists = await User.findOne({ email });
-  if (exists)
-    return res.status(400).json({ error: "Email already registered" });
-
-  const hash = await bcrypt.hash(password, 10);
-  const code = generateOTP();
-
-  await User.create({
-    name,
-    email,
-    password: hash,
-    verified: false,
-    verifyCodeHash: await bcrypt.hash(code, 10),
-    verifyCodeExpires: Date.now() + 10 * 60 * 1000
-  });
-
-  await transporter.sendMail({
-    from: `"GLOM Store" <pixelframe89@gmail.com>`,
-    to: email,
-    subject: "Verify your email - GLOM Store",
-    html: emailTemplate(code)
-  });
-
-  res.json({ success: true });
-});
-app.get("/test-email", async (req, res) => {
   try {
-    await transporter.sendMail({
-      from: `"GLOM Store" <yaghipegusp9@outlook.com>`,
-      to: "yaghipegusp9@outlook.com",
-      subject: "Brevo Test Email",
-      html: "<h2>If you see this, Brevo works ✅</h2>"
+    const { name, email, password } = req.body;
+    if (!name || !email || !password)
+      return res.status(400).json({ error: "All fields required" });
+
+    const exists = await User.findOne({ email });
+    if (exists)
+      return res.status(400).json({ error: "Email already registered" });
+
+    const hash = await bcrypt.hash(password, 10);
+    const code = generateOTP();
+
+    await User.create({
+      name,
+      email,
+      password: hash,
+      verified: false,
+      verifyCodeHash: await bcrypt.hash(code, 10),
+      verifyCodeExpires: Date.now() + 10 * 60 * 1000
     });
-    res.send("Email sent");
+
+    await sendEmailBrevo(
+      email,
+      "Verify your email - GLOM Store",
+      emailTemplate(code)
+    );
+
+    res.json({ success: true });
+
   } catch (err) {
-    console.error("TEST EMAIL ERROR:", err);
-    res.status(500).send("Failed");
+    console.error("REGISTER ERROR:", err.message);
+    res.status(500).json({ error: "Email send failed" });
   }
 });
 
-
-// ================= Resend OTP (NEW) =================
+// ================= Resend OTP =================
 app.post("/api/resend-code", async (req, res) => {
-  const { email } = req.body;
-  if (!email) return res.status(400).json({ error: "Email required" });
+  try {
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+    if (!user) return res.status(404).json({ error: "User not found" });
 
-  const user = await User.findOne({ email });
-  if (!user) return res.status(404).json({ error: "User not found" });
+    const code = generateOTP();
+    user.verifyCodeHash = await bcrypt.hash(code, 10);
+    user.verifyCodeExpires = Date.now() + 10 * 60 * 1000;
+    await user.save();
 
-  if (user.verified)
-    return res.json({ success: true, message: "Already verified" });
+    await sendEmailBrevo(
+      email,
+      "Your new verification code - GLOM Store",
+      emailTemplate(code)
+    );
 
-  const code = generateOTP();
-  user.verifyCodeHash = await bcrypt.hash(code, 10);
-  user.verifyCodeExpires = Date.now() + 10 * 60 * 1000;
-  await user.save();
+    res.json({ success: true });
 
-  await transporter.sendMail({
-    from: `"GLOM Store" <yaghipegusp9@outlook.com>`,
-    to: email,
-    subject: "Your new verification code - GLOM Store",
-    html: emailTemplate(code)
-  });
-
-  res.json({ success: true });
+  } catch (err) {
+    console.error("RESEND ERROR:", err.message);
+    res.status(500).json({ error: "Resend failed" });
+  }
 });
 
 // ================= Verify =================
@@ -181,4 +183,3 @@ app.get("*", (req, res) =>
 );
 
 app.listen(PORT, ()=>console.log("Server running on", PORT));
-
