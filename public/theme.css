@@ -22,21 +22,27 @@ body{
 /* HEADER */
 .header{
   background:linear-gradient(180deg, rgba(10,4,20,.95), rgba(5,2,10,.8));
-  border-bottom:1px solid var(--border);
+  /* ❌ شلنا الخط الفاصل */
 }
 .header-flex{
   display:flex;
   justify-content:space-between;
   align-items:center;
-  padding:28px 40px;
+  padding:22px 40px;
 }
-.header h1{font-size:36px;letter-spacing:2px}
-.header span{color:var(--purple);text-shadow:0 0 20px rgba(182,107,255,.7)}
+.header h1{
+  font-size:28px; /* 🔽 تصغير الاسم */
+  letter-spacing:1.5px;
+}
+.header span{
+  color:var(--purple);
+  text-shadow:0 0 20px rgba(182,107,255,.7);
+}
 
 /* ACCOUNT */
 .account{position:relative}
 .avatar{
-  width:46px;height:46px;border-radius:50%;
+  width:44px;height:44px;border-radius:50%;
   background:radial-gradient(circle at 30% 30%, var(--purple), #12001f 60%);
   border:1px solid var(--border);
   box-shadow:0 0 20px rgba(182,107,255,.6);
@@ -47,7 +53,7 @@ body{
 .avatar:active{transform:scale(.9)}
 
 .account-menu{
-  position:absolute;right:0;top:60px;
+  position:absolute;right:0;top:56px;
   background:#0b021a;
   border:1px solid var(--border);
   border-radius:14px;
@@ -68,7 +74,7 @@ body{
 .tabs{
   display:flex;
   gap:14px;
-  padding:18px 40px;
+  padding:14px 40px;
 }
 .tab{
   padding:8px 14px;
@@ -140,4 +146,60 @@ body{
   text-decoration:none;
   font-weight:bold;
   box-shadow:0 0 30px rgba(182,107,255,.8);
+}
+
+/* ===== AUTH PAGES (Login / Register) ===== */
+.auth-wrap{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.auth-box{
+  width:100%;
+  max-width:420px;
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:22px;
+  padding:28px;
+  box-shadow:0 0 50px rgba(182,107,255,.35);
+}
+.auth-box h2{
+  text-align:center;
+  margin-bottom:10px;
+}
+.auth-box p{
+  text-align:center;
+  font-size:14px;
+  color:var(--muted);
+}
+.auth-box input{
+  width:100%;
+  margin-top:14px;
+  padding:12px;
+  border-radius:14px;
+  border:1px solid rgba(182,107,255,.3);
+  background:#12001f;
+  color:#fff;
+}
+.auth-box input:focus{
+  outline:none;
+  box-shadow:0 0 20px rgba(182,107,255,.6);
+}
+.auth-box .btn{
+  margin-top:20px;
+}
+.auth-link{
+  margin-top:16px;
+  text-align:center;
+  font-size:14px;
+}
+.auth-link a{
+  color:var(--purple);
+  text-decoration:none;
+}
+.auth-msg{
+  margin-top:12px;
+  text-align:center;
+  font-size:13px;
 }
