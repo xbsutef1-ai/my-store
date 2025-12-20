@@ -2,7 +2,8 @@
 <html lang="ar">
 <head>
   <meta charset="UTF-8">
-  <title>Register</title>
+  <title>Register - GLOM Store</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="theme.css">
 </head>
 <body>
@@ -10,39 +11,57 @@
 <div class="auth-wrap">
   <div class="auth-box">
     <h2>Create Account</h2>
+    <p>Join GLOM Store</p>
 
-    <input id="name" placeholder="Username">
-    <input id="email" placeholder="Email">
-    <input id="password" type="password" placeholder="Password">
+    <input id="nameInput" placeholder="Username">
+    <input id="emailInput" placeholder="Email">
+    <input id="passwordInput" type="password" placeholder="Password">
 
-    <button class="btn" id="regBtn">Register</button>
+    <button class="btn" id="registerBtn">Register</button>
 
     <div class="auth-msg" id="msg"></div>
 
     <div class="auth-link">
-      Have code? <a href="/verify.html">Verify Email</a>
+      Already registered? <a href="/verify.html">Verify Email</a>
     </div>
   </div>
 </div>
 
 <script>
+const registerBtn = document.getElementById("registerBtn");
 const msg = document.getElementById("msg");
-document.getElementById("regBtn").onclick = async () => {
+
+registerBtn.addEventListener("click", async () => {
   msg.textContent = "";
-  const res = await fetch("/api/register", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      name: name.value.trim(),
-      email: email.value.trim(),
-      password: password.value
-    })
-  });
-  const data = await res.json().catch(()=>({}));
-  msg.textContent = res.ok
-    ? "Code sent to email"
-    : (data.error || "Register failed");
-};
+
+  const name = document.getElementById("nameInput").value.trim();
+  const email = document.getElementById("emailInput").value.trim();
+  const password = document.getElementById("passwordInput").value;
+
+  if (!name || !email || !password) {
+    msg.textContent = "Please fill all fields";
+    return;
+  }
+
+  try {
+    const res = await fetch("/api/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, email, password })
+    });
+
+    const data = await res.json().catch(() => ({}));
+
+    if (!res.ok) {
+      msg.textContent = data.error || "Register failed";
+      return;
+    }
+
+    msg.textContent = "Verification code sent to your email";
+  } catch (err) {
+    msg.textContent = "Network error";
+  }
+});
 </script>
 
 </body>
