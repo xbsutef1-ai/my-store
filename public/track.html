@@ -1,31 +1,258 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Track Order</title>
- <link rel="stylesheet" href="theme.css">
-</head>
-<body>
+/* ======================================
+   GLOM STORE – ULTRA THEME
+   Purple / Black / Neon / Animated
+====================================== */
 
-<div class="container">
-  <h2>تتبع الطلب</h2>
-  <input id="orderId" placeholder="أدخل رقم الطلب">
-  <button onclick="track()">تتبع</button>
+:root {
+  --bg-main: #04010a;
+  --bg-panel: rgba(14, 6, 28, 0.85);
 
-  <div id="result"></div>
-</div>
+  --purple-1: #b66bff;
+  --purple-2: #8f2bff;
+  --purple-3: #5a00ff;
 
-<script>
-async function track() {
-  const id = orderId.value;
-  const res = await fetch(`/api/order/${id}`);
-  const data = await res.json();
+  --glow-strong: 0 0 35px rgba(182,107,255,.65);
+  --glow-soft: 0 0 18px rgba(182,107,255,.35);
 
-  result.innerHTML = `
-    <p>الحالة: <b>${data.status}</b></p>
-    ${data.deliveredItem ? `<p>المنتج: ${data.deliveredItem}</p>` : ""}
-  `;
+  --text-main: #f4ecff;
+  --text-muted: #b9a9d8;
+
+  --border: rgba(182,107,255,.25);
 }
-</script>
-</body>
-</html>
 
+/* ===== RESET ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", system-ui, sans-serif;
+}
+
+body {
+  background:
+    radial-gradient(1200px circle at 20% -10%, rgba(182,107,255,.25), transparent 60%),
+    radial-gradient(900px circle at 120% 10%, rgba(90,0,255,.2), transparent 55%),
+    var(--bg-main);
+  color: var(--text-main);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ===== HEADER ===== */
+.header {
+  background: linear-gradient(180deg, rgba(10,4,20,.95), rgba(5,2,10,.75));
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(10px);
+}
+
+.header-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 28px 40px;
+}
+
+.header h1 {
+  font-size: 36px;
+  letter-spacing: 2px;
+}
+
+.header span {
+  color: var(--purple-1);
+  text-shadow: var(--glow-soft);
+}
+
+/* ===== ACCOUNT AVATAR ===== */
+.account {
+  position: relative;
+}
+
+.avatar {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  cursor: pointer;
+  background:
+    radial-gradient(circle at 30% 30%, rgba(182,107,255,.9), rgba(10,5,20,.9) 60%);
+  border: 1px solid var(--border);
+  box-shadow: var(--glow-soft);
+  transition: .2s;
+}
+
+.avatar:hover {
+  box-shadow: var(--glow-strong);
+}
+
+.avatar:active {
+  transform: scale(.92);
+}
+
+/* ===== DROPDOWN ===== */
+.account-menu {
+  position: absolute;
+  right: 0;
+  top: 60px;
+  width: 190px;
+  background: rgba(8,3,18,.95);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: 0 0 40px rgba(182,107,255,.25);
+  overflow: hidden;
+  z-index: 1000;
+}
+
+.account-menu a {
+  display: block;
+  padding: 12px 14px;
+  text-decoration: none;
+  color: var(--text-main);
+  font-size: 14px;
+  transition: .15s;
+}
+
+.account-menu a:hover {
+  background: rgba(182,107,255,.18);
+}
+
+.hidden {
+  display: none;
+}
+
+/* ===== CATEGORY TABS ===== */
+.tabs {
+  display: flex;
+  gap: 14px;
+  padding: 18px 40px;
+}
+
+.tab {
+  padding: 8px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(182,107,255,.15);
+  background: rgba(182,107,255,.08);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: .15s;
+  position: relative;
+  overflow: hidden;
+}
+
+.tab::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, transparent, rgba(255,255,255,.25), transparent);
+  transform: translateX(-120%);
+}
+
+.tab:hover::after {
+  animation: sweep .6s;
+}
+
+.tab:hover {
+  color: #fff;
+  box-shadow: var(--glow-soft);
+}
+
+.tab.active {
+  color: #fff;
+  background: linear-gradient(180deg, rgba(182,107,255,.45), rgba(90,0,255,.25));
+  box-shadow: var(--glow-strong);
+}
+
+.tab:active {
+  transform: scale(.94);
+}
+
+/* ===== LAYOUT ===== */
+.container {
+  padding: 20px 40px 60px;
+}
+
+.products {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px,1fr));
+  gap: 22px;
+}
+
+/* ===== PRODUCT CARD ===== */
+.product {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(25px) scale(.98);
+}
+
+.product.reveal {
+  animation: cardIn .6s ease forwards;
+}
+
+.product::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  background:
+    radial-gradient(500px circle at 20% 0%, rgba(182,107,255,.25), transparent 60%);
+  pointer-events: none;
+}
+
+.product:hover {
+  box-shadow: var(--glow-strong);
+}
+
+.product h3 {
+  color: #fff;
+  text-shadow: var(--glow-soft);
+}
+
+.product p {
+  margin-top: 8px;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.price {
+  margin-top: 10px;
+  font-weight: 800;
+}
+
+/* ===== BUTTONS ===== */
+.btn {
+  margin-top: 14px;
+  width: 100%;
+  padding: 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(182,107,255,.35);
+  background: linear-gradient(180deg, rgba(182,107,255,.9), rgba(90,0,255,.6));
+  color: #fff;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: var(--glow-soft);
+  transition: .15s;
+}
+
+.btn:hover {
+  box-shadow: var(--glow-strong);
+}
+
+.btn:active {
+  transform: scale(.95);
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes cardIn {
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes sweep {
+  to {
+    transform: translateX(120%);
+  }
+}
