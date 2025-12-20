@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Track Order</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+  <h2>تتبع الطلب</h2>
+  <input id="orderId" placeholder="أدخل رقم الطلب">
+  <button onclick="track()">تتبع</button>
+
+  <div id="result"></div>
+</div>
+
+<script>
+async function track() {
+  const id = orderId.value;
+  const res = await fetch(`/api/order/${id}`);
+  const data = await res.json();
+
+  result.innerHTML = `
+    <p>الحالة: <b>${data.status}</b></p>
+    ${data.deliveredItem ? `<p>المنتج: ${data.deliveredItem}</p>` : ""}
+  `;
+}
+</script>
+</body>
+</html>

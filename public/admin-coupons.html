@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>GLOM Admin - Coupons</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="header">
+  <h1>GLOM <span>Coupons</span></h1>
+  <p>إدارة أكواد الخصم</p>
+</header>
+
+<main class="container">
+
+  <h2>إضافة كوبون</h2>
+  <form id="couponForm" class="admin-form">
+    <input id="code" placeholder="CODE (مثال: GLOM10)" required>
+    <select id="type">
+      <option value="percent">نسبة مئوية %</option>
+      <option value="fixed">مبلغ ثابت</option>
+    </select>
+    <input id="value" type="number" placeholder="قيمة الخصم" required>
+    <input id="maxUses" type="number" placeholder="عدد الاستخدامات (اختياري)">
+    <input id="expiresAt" type="date">
+    <button type="submit">إضافة الكوبون</button>
+  </form>
+
+  <h2>الكوبونات الحالية</h2>
+  <div id="coupons" class="products"></div>
+
+</main>
+
+<script src="admin.js"></script>
+</body>
+</html>

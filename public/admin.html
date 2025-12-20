@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>GLOM Store - Admin</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="header">
+  <h1>GLOM <span>Admin</span></h1>
+  <p>لوحة التحكم</p>
+</header>
+
+<main class="container">
+
+  <div class="stats">
+    <div id="statProducts">Products: 0</div>
+    <div id="statOrders">Orders: 0</div>
+    <div id="statRevenue">Revenue: 0 SAR</div>
+  </div>
+
+  <h2>إضافة منتج</h2>
+  <form id="productForm" class="admin-form">
+    <input id="name" placeholder="اسم المنتج" required>
+    <textarea id="description" placeholder="وصف المنتج"></textarea>
+    <input id="price" type="number" placeholder="السعر" required>
+    <select id="type">
+      <option value="key">Key</option>
+      <option value="account">Account</option>
+    </select>
+    <button type="submit">إضافة المنتج</button>
+  </form>
+
+  <h2>المنتجات</h2>
+  <div id="adminProducts" class="products"></div>
+
+</main>
+
+<script src="admin.js"></script>
+</body>
+</html>

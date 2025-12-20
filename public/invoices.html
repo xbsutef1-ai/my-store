@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>My Invoices - GLOM Store</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+  <h2>فواتيري</h2>
+  <div id="list"></div>
+</div>
+
+<script>
+async function loadInvoices() {
+  const res = await fetch("/api/my/invoices", {
+    headers: { authorization: localStorage.token }
+  });
+  const invoices = await res.json();
+
+  list.innerHTML = "";
+  invoices.forEach(i => {
+    list.innerHTML += `
+      <div class="product">
+        <p><b>Invoice:</b> ${i.invoiceId}</p>
+        <p>Amount: ${i.amount} SAR</p>
+        <a href="/invoices/${i.invoiceFile}" target="_blank">
+          تحميل PDF
+        </a>
+      </div>
+    `;
+  });
+}
+loadInvoices();
+</script>
+
+</body>
+</html>

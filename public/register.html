@@ -1,0 +1,17 @@
+<input id="email" placeholder="Email">
+<input id="password" type="password">
+<button onclick="register()">Register</button>
+
+<script>
+async function register() {
+  await fetch("/api/register", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      email: email.value,
+      password: password.value
+    })
+  });
+  alert("Account created");
+}
+</script>

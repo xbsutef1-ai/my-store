@@ -1,0 +1,131 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", Tahoma;
+}
+
+body {
+  background: radial-gradient(circle at top, #120000, #050000 70%);
+  color: #eee;
+  min-height: 100vh;
+}
+
+.header {
+  text-align: center;
+  padding: 45px 20px;
+  background: linear-gradient(180deg, #140000, #080000);
+  border-bottom: 1px solid #400;
+}
+
+.header h1 {
+  font-size: 42px;
+}
+
+.header span {
+  color: #c00000;
+}
+
+.container {
+  padding: 40px;
+}
+
+.products {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 28px;
+}
+
+.product {
+  background: linear-gradient(180deg, #0f0f0f, #060606);
+  border: 1px solid #400;
+  border-radius: 12px;
+  padding: 20px;
+  transition: 0.25s;
+}
+
+.product:hover {
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 0 25px rgba(255,0,0,0.35);
+}
+
+.product h3 {
+  color: #ff4d4d;
+  margin-bottom: 10px;
+}
+
+button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 12px;
+  background: linear-gradient(180deg, #a00000, #700000);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  transition: 0.15s;
+}
+
+button:active {
+  transform: scale(0.94);
+  box-shadow: inset 0 0 15px rgba(0,0,0,0.7);
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hidden {
+  display: none;
+}
+
+.modal-box {
+  background: #0b0b0b;
+  border: 1px solid #500;
+  padding: 25px;
+  border-radius: 14px;
+  width: 360px;
+  animation: pop 0.3s ease;
+}
+
+.discord {
+  position: fixed;
+  bottom: 22px;
+  right: 22px;
+  background: #5865F2;
+  padding: 14px 22px;
+  border-radius: 30px;
+  color: white;
+  text-decoration: none;
+}
+
+#bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+}
+
+@keyframes pop {
+  from { transform: scale(0.85); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+/* نفس الثيم السابق + إضافات */
+
+input {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  border-radius: 6px;
+  border: none;
+}
+
+#couponMsg {
+  margin-top: 10px;
+  color: #00ff99;
+}

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Dashboard - GLOM Store</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+  <h2>Dashboard الأرباح</h2>
+
+  <div class="stats">
+    <div id="total">Total: 0</div>
+    <div id="today">Today: 0</div>
+    <div id="orders">Orders: 0</div>
+  </div>
+</div>
+
+<script>
+const key = prompt("Admin Password");
+
+async function loadStats() {
+  const res = await fetch("/api/admin/earnings", {
+    headers: { "x-admin-key": key }
+  });
+  const data = await res.json();
+
+  total.innerText = "Total Revenue: " + data.totalRevenue + " SAR";
+  today.innerText = "Today Revenue: " + data.todayRevenue + " SAR";
+  orders.innerText = "Orders: " + data.totalOrders;
+}
+loadStats();
+</script>
+
+</body>
+</html>
