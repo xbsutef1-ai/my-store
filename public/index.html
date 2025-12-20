@@ -4,27 +4,35 @@
   <meta charset="UTF-8">
   <title>GLOM Store</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
- <link rel="stylesheet" href="theme.css">
+  <link rel="stylesheet" href="theme.css">
 </head>
-  <a class="discord" href="https://discord.gg/YOUR_SERVER" target="_blank">
-  Support
-</a>
 <body>
 
 <header class="header">
   <h1>GLOM <span>Store</span></h1>
+  <p>Digital Products</p>
 </header>
-  
-  <nav class="nav">
+
+<!-- ===== NAVBAR ===== -->
+<nav class="nav">
   <a href="/login.html">تسجيل الدخول</a>
   <a href="/register.html">إنشاء حساب</a>
   <a href="/account.html">حسابي</a>
 </nav>
 
+<!-- ===== CATEGORIES ===== -->
+<nav class="nav">
+  <button onclick="filterCategory('ALL')">الكل</button>
+  <button onclick="filterCategory('TWEAKS')">تويكات</button>
+  <button onclick="filterCategory('TOOLS')">أدوات</button>
+</nav>
+
+<!-- ===== PRODUCTS ===== -->
 <main class="container">
   <div id="products" class="products"></div>
 </main>
 
+<!-- ===== ORDER MODAL ===== -->
 <div id="modal" class="modal hidden">
   <div class="modal-box">
     <h2>إتمام الطلب</h2>
@@ -41,9 +49,11 @@
   </div>
 </div>
 
+<!-- ===== DISCORD SUPPORT ===== -->
+<a class="discord" href="https://discord.gg/BKz2JqktdU" target="_blank">
+  Support
+</a>
+
 <script src="app.js"></script>
 </body>
 </html>
-
-
-
