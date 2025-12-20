@@ -29,24 +29,21 @@
 
 <script>
 const msg=document.getElementById("msg");
-
 regBtn.onclick=async()=>{
   msg.textContent="";
   const res=await fetch("/api/register",{
     method:"POST",
     headers:{ "Content-Type":"application/json" },
     body:JSON.stringify({
-      name: name.value.trim(),
-      email: email.value.trim(),
-      password: password.value
+      name:name.value.trim(),
+      email:email.value.trim(),
+      password:password.value
     })
   });
   const data=await res.json().catch(()=>({}));
-  if(!res.ok){
-    msg.textContent=data.error||"Register failed";
-    return;
-  }
-  msg.textContent="Account created. Check your email for verification.";
+  msg.textContent=res.ok
+    ?"Account created. Check your email."
+    :(data.error||"Register failed");
 };
 </script>
 </body>
