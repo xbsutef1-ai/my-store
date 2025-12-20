@@ -15,6 +15,9 @@
     <input id="code" placeholder="6-digit code">
 
     <button class="btn" id="verifyBtn">Verify</button>
+    <button class="btn" id="resendBtn" style="margin-top:10px">
+      Send new code
+    </button>
 
     <div class="auth-msg" id="msg"></div>
   </div>
@@ -22,20 +25,30 @@
 
 <script>
 const msg = document.getElementById("msg");
-document.getElementById("verifyBtn").onclick = async () => {
+
+verifyBtn.onclick = async () => {
   msg.textContent = "";
-  const res = await fetch("/api/verify", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
+  const res = await fetch("/api/verify",{
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body:JSON.stringify({
       email: email.value.trim(),
       code: code.value.trim()
     })
   });
   const data = await res.json().catch(()=>({}));
-  msg.textContent = res.ok
-    ? "Verified. You can login now."
-    : (data.error || "Verify failed");
+  msg.textContent = res.ok ? "Verified successfully" : data.error;
+};
+
+resendBtn.onclick = async () => {
+  msg.textContent = "Sending new code...";
+  const res = await fetch("/api/resend-code",{
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body:JSON.stringify({ email: email.value.trim() })
+  });
+  const data = await res.json().catch(()=>({}));
+  msg.textContent = res.ok ? "New code sent to your email" : data.error;
 };
 </script>
 
