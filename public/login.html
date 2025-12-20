@@ -27,25 +27,44 @@
 </div>
 
 <script>
-const msg=document.getElementById("msg");
-loginBtn.onclick=async()=>{
-  msg.textContent="";
-  const res=await fetch("/api/login",{
-    method:"POST",
-    headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify({
-      email:email.value.trim(),
-      password:password.value
-    })
-  });
-  const data=await res.json().catch(()=>({}));
-  if(!res.ok){
-    msg.textContent=data.error||"Login failed";
+const msg = document.getElementById("msg");
+const loginBtn = document.getElementById("loginBtn");
+
+loginBtn.addEventListener("click", async () => {
+  msg.textContent = "";
+
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+
+  if (!email || !password) {
+    msg.textContent = "Please fill all fields";
     return;
   }
-  localStorage.setItem("token",data.token);
-  location.href="/";
-};
+
+  const res = await fetch("/api/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password })
+  });
+
+  const data = await res.json().catch(() => ({}));
+
+  if (!res.ok) {
+    if (data.error === "NOT_VERIFIED") {
+      msg.innerHTML = `
+        Account not verified.<br>
+        <a href="/verify.html" style="color:#b66bff">Verify now</a>
+      `;
+      return;
+    }
+    msg.textContent = data.error || "Login failed";
+    return;
+  }
+
+  localStorage.setItem("token", data.token);
+  location.href = "/";
+});
 </script>
+
 </body>
 </html>
