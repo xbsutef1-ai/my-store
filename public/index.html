@@ -8,24 +8,35 @@
 </head>
 <body>
 
-<header class="header">
+<!-- ===== HEADER ===== -->
+<header class="header header-flex">
   <h1>GLOM <span>Store</span></h1>
-  <p>Digital Products</p>
+
+  <!-- ACCOUNT ICON -->
+  <div class="account">
+    <img
+      src="https://cdn-icons-png.flaticon.com/512/847/847969.png"
+      id="accountBtn"
+      alt="Account"
+    >
+
+    <div class="account-menu hidden" id="accountMenu">
+      <a href="/login.html">Login</a>
+      <a href="/register.html">Register</a>
+      <hr>
+      <a href="/account.html">My Account</a>
+      <a href="/invoices.html">Invoices</a>
+      <a href="#" onclick="logout()">Logout</a>
+    </div>
+  </div>
 </header>
 
-<!-- ===== NAVBAR ===== -->
-<nav class="nav">
-  <a href="/login.html">تسجيل الدخول</a>
-  <a href="/register.html">إنشاء حساب</a>
-  <a href="/account.html">حسابي</a>
-</nav>
-
-<!-- ===== CATEGORIES ===== -->
-<nav class="nav">
-  <button onclick="filterCategory('ALL')">الكل</button>
-  <button onclick="filterCategory('TWEAKS')">تويكات</button>
-  <button onclick="filterCategory('TOOLS')">أدوات</button>
-</nav>
+<!-- ===== CATEGORY TABS ===== -->
+<div class="category-tabs">
+  <button class="tab active" onclick="filterCategory('ALL')">All</button>
+  <button class="tab" onclick="filterCategory('TWEAKS')">Tweaks</button>
+  <button class="tab" onclick="filterCategory('TOOLS')">Tools</button>
+</div>
 
 <!-- ===== PRODUCTS ===== -->
 <main class="container">
@@ -35,22 +46,22 @@
 <!-- ===== ORDER MODAL ===== -->
 <div id="modal" class="modal hidden">
   <div class="modal-box">
-    <h2>إتمام الطلب</h2>
+    <h2>Checkout</h2>
 
     <p id="priceInfo"></p>
 
-    <input id="coupon" placeholder="كود الخصم (اختياري)">
-    <button onclick="applyCoupon()">تطبيق الخصم</button>
+    <input id="coupon" placeholder="Discount code (optional)">
+    <button onclick="applyCoupon()">Apply</button>
 
     <p id="couponMsg"></p>
 
-    <button onclick="confirmOrder()">تأكيد الطلب</button>
-    <button onclick="closeModal()">إلغاء</button>
+    <button class="primary" onclick="confirmOrder()">Confirm Order</button>
+    <button class="secondary" onclick="closeModal()">Cancel</button>
   </div>
 </div>
 
 <!-- ===== DISCORD SUPPORT ===== -->
-<a class="discord" href="https://discord.gg/BKz2JqktdU" target="_blank">
+<a class="discord" href="https://discord.gg/YOUR_SERVER" target="_blank">
   Support
 </a>
 
