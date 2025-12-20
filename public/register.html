@@ -2,8 +2,7 @@
 <html lang="ar">
 <head>
   <meta charset="UTF-8">
-  <title>Register - GLOM Store</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Register</title>
   <link rel="stylesheet" href="theme.css">
 </head>
 <body>
@@ -11,7 +10,6 @@
 <div class="auth-wrap">
   <div class="auth-box">
     <h2>Create Account</h2>
-    <p>Join GLOM Store</p>
 
     <input id="name" placeholder="Username">
     <input id="email" placeholder="Email">
@@ -22,29 +20,30 @@
     <div class="auth-msg" id="msg"></div>
 
     <div class="auth-link">
-      Already have an account? <a href="/login.html">Login</a>
+      Have code? <a href="/verify.html">Verify Email</a>
     </div>
   </div>
 </div>
 
 <script>
-const msg=document.getElementById("msg");
-regBtn.onclick=async()=>{
-  msg.textContent="";
-  const res=await fetch("/api/register",{
-    method:"POST",
-    headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify({
-      name:name.value.trim(),
-      email:email.value.trim(),
-      password:password.value
+const msg = document.getElementById("msg");
+document.getElementById("regBtn").onclick = async () => {
+  msg.textContent = "";
+  const res = await fetch("/api/register", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      name: name.value.trim(),
+      email: email.value.trim(),
+      password: password.value
     })
   });
-  const data=await res.json().catch(()=>({}));
-  msg.textContent=res.ok
-    ?"Account created. Check your email."
-    :(data.error||"Register failed");
+  const data = await res.json().catch(()=>({}));
+  msg.textContent = res.ok
+    ? "Code sent to email"
+    : (data.error || "Register failed");
 };
 </script>
+
 </body>
 </html>
