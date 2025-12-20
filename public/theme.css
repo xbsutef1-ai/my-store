@@ -1,234 +1,143 @@
-/* ===============================
-   GLOM STORE - MASTER THEME
-   =============================== */
-
 :root {
-  --bg-main: radial-gradient(circle at top, #140000, #050000 70%);
-  --bg-card: linear-gradient(180deg, #121212, #070707);
-  --bg-header: linear-gradient(180deg, #180000, #080000);
-  --accent: #ff3b3b;
-  --accent-soft: rgba(255, 59, 59, 0.4);
-  --border: #300;
-  --text-main: #eee;
-  --text-muted: #aaa;
+  --bg: #05020a;
+  --panel: rgba(20, 8, 40, .85);
+  --purple: #b66bff;
+  --purple-dark: #6a1bff;
+  --border: rgba(182,107,255,.35);
+  --text: #f4ecff;
+  --muted: #b9a9d8;
 }
 
-/* ===== Reset ===== */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: "Segoe UI", Tahoma, sans-serif;
+/* RESET */
+*{margin:0;padding:0;box-sizing:border-box;font-family:"Segoe UI",sans-serif}
+body{
+  background:
+    radial-gradient(900px circle at 20% -10%, rgba(182,107,255,.35), transparent 60%),
+    radial-gradient(700px circle at 120% 10%, rgba(90,0,255,.25), transparent 55%),
+    var(--bg);
+  color:var(--text);
+  min-height:100vh;
 }
 
-body {
-  background: var(--bg-main);
-  color: var(--text-main);
-  min-height: 100vh;
+/* HEADER */
+.header{
+  background:linear-gradient(180deg, rgba(10,4,20,.95), rgba(5,2,10,.8));
+  border-bottom:1px solid var(--border);
+}
+.header-flex{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:28px 40px;
+}
+.header h1{font-size:36px;letter-spacing:2px}
+.header span{color:var(--purple);text-shadow:0 0 20px rgba(182,107,255,.7)}
+
+/* ACCOUNT */
+.account{position:relative}
+.avatar{
+  width:46px;height:46px;border-radius:50%;
+  background:radial-gradient(circle at 30% 30%, var(--purple), #12001f 60%);
+  border:1px solid var(--border);
+  box-shadow:0 0 20px rgba(182,107,255,.6);
+  cursor:pointer;
+  transition:.2s;
+}
+.avatar:hover{box-shadow:0 0 40px rgba(182,107,255,.9)}
+.avatar:active{transform:scale(.9)}
+
+.account-menu{
+  position:absolute;right:0;top:60px;
+  background:#0b021a;
+  border:1px solid var(--border);
+  border-radius:14px;
+  width:180px;
+  box-shadow:0 0 40px rgba(182,107,255,.3);
+}
+.account-menu a{
+  display:block;
+  padding:12px 14px;
+  color:var(--text);
+  text-decoration:none;
+  font-size:14px;
+}
+.account-menu a:hover{background:rgba(182,107,255,.2)}
+.hidden{display:none}
+
+/* TABS */
+.tabs{
+  display:flex;
+  gap:14px;
+  padding:18px 40px;
+}
+.tab{
+  padding:8px 14px;
+  border-radius:14px;
+  border:1px solid rgba(182,107,255,.2);
+  background:rgba(182,107,255,.08);
+  color:var(--muted);
+  cursor:pointer;
+  transition:.15s;
+}
+.tab:hover{color:#fff;box-shadow:0 0 20px rgba(182,107,255,.4)}
+.tab.active{
+  background:linear-gradient(180deg, var(--purple), var(--purple-dark));
+  color:#fff;
+  box-shadow:0 0 35px rgba(182,107,255,.9);
+}
+.tab:active{transform:scale(.94)}
+
+/* LAYOUT */
+.container{padding:20px 40px 60px}
+.products{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:22px;
 }
 
-/* ===== Header ===== */
-.header {
-  background: var(--bg-header);
-  border-bottom: 1px solid var(--border);
+/* PRODUCT */
+.product{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:20px;
+  opacity:0;
+  transform:translateY(30px);
+}
+.product.reveal{animation:cardIn .6s ease forwards}
+.product:hover{box-shadow:0 0 40px rgba(182,107,255,.6)}
+.product h3{color:#fff;text-shadow:0 0 15px rgba(182,107,255,.6)}
+.product p{margin-top:8px;color:var(--muted)}
+.price{margin-top:10px;font-weight:800}
+
+/* BUTTON */
+.btn{
+  margin-top:14px;
+  width:100%;
+  padding:12px;
+  border-radius:14px;
+  border:1px solid rgba(182,107,255,.4);
+  background:linear-gradient(180deg, var(--purple), var(--purple-dark));
+  color:#fff;
+  font-weight:bold;
+  cursor:pointer;
+  box-shadow:0 0 25px rgba(182,107,255,.6);
+}
+.btn:active{transform:scale(.95)}
+
+@keyframes cardIn{
+  to{opacity:1;transform:translateY(0)}
 }
 
-.header-flex {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 28px 40px;
-}
-
-.header h1 {
-  font-size: 36px;
-  letter-spacing: 2px;
-}
-
-.header span {
-  color: var(--accent);
-}
-
-/* ===== Account ===== */
-.account {
-  position: relative;
-}
-
-.account img {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  cursor: pointer;
-  border: 2px solid var(--accent-soft);
-  transition: 0.2s;
-}
-
-.account img:hover {
-  box-shadow: 0 0 12px var(--accent-soft);
-}
-
-/* ===== Account Menu ===== */
-.account-menu {
-  position: absolute;
-  right: 0;
-  top: 56px;
-  background: #0b0b0b;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  width: 180px;
-  overflow: hidden;
-  z-index: 100;
-}
-
-.account-menu a {
-  display: block;
-  padding: 12px 14px;
-  color: var(--text-main);
-  text-decoration: none;
-  font-size: 14px;
-}
-
-.account-menu a:hover {
-  background: #1a0000;
-}
-
-.account-menu hr {
-  border: none;
-  border-top: 1px solid #300;
-}
-
-/* ===== Categories ===== */
-.category-tabs {
-  display: flex;
-  gap: 20px;
-  padding: 16px 40px;
-}
-
-.tab {
-  background: transparent;
-  border: none;
-  color: var(--text-muted);
-  font-size: 14px;
-  cursor: pointer;
-  padding-bottom: 6px;
-  border-bottom: 2px solid transparent;
-  transition: 0.2s;
-}
-
-.tab:hover {
-  color: #fff;
-}
-
-.tab.active {
-  color: var(--accent);
-  border-bottom: 2px solid var(--accent);
-}
-
-/* ===== Layout ===== */
-.container {
-  padding: 40px;
-}
-
-.products {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 28px;
-}
-
-/* ===== Product Card ===== */
-.product {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 22px;
-  transition: 0.25s;
-}
-
-.product:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 0 28px rgba(255, 59, 59, 0.35);
-}
-
-.product h3 {
-  color: var(--accent);
-  margin-bottom: 10px;
-}
-
-.product p {
-  font-size: 14px;
-  color: var(--text-muted);
-}
-
-/* ===== Buttons ===== */
-button {
-  width: 100%;
-  padding: 12px;
-  margin-top: 12px;
-  border-radius: 10px;
-  border: none;
-  cursor: pointer;
-  font-weight: bold;
-  transition: 0.15s;
-}
-
-button.primary {
-  background: linear-gradient(180deg, #ff3b3b, #b00000);
-  color: #fff;
-}
-
-button.secondary {
-  background: #222;
-  color: #ccc;
-}
-
-button:hover {
-  filter: brightness(1.1);
-}
-
-button:active {
-  transform: scale(0.96);
-}
-
-/* ===== Modal ===== */
-.modal {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.9);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.hidden {
-  display: none;
-}
-
-.modal-box {
-  background: #0b0b0b;
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 28px;
-  width: 360px;
-}
-
-/* ===== Inputs ===== */
-input {
-  width: 100%;
-  padding: 10px;
-  border-radius: 8px;
-  border: none;
-  margin-top: 10px;
-}
-
-/* ===== Discord ===== */
-.discord {
-  position: fixed;
-  bottom: 22px;
-  right: 22px;
-  background: #5865F2;
-  padding: 14px 24px;
-  border-radius: 30px;
-  color: white;
-  text-decoration: none;
-  font-weight: bold;
+/* DISCORD */
+.discord{
+  position:fixed;
+  bottom:20px;right:20px;
+  padding:12px 20px;
+  border-radius:999px;
+  background:linear-gradient(90deg, var(--purple), var(--purple-dark));
+  color:#fff;
+  text-decoration:none;
+  font-weight:bold;
+  box-shadow:0 0 30px rgba(182,107,255,.8);
 }
