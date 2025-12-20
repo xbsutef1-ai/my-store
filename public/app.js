@@ -1,42 +1,41 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-  // ===== DOM =====
   const productsDiv = document.getElementById("products");
   const modal = document.getElementById("modal");
   const priceInfo = document.getElementById("priceInfo");
   const couponInput = document.getElementById("coupon");
   const couponMsg = document.getElementById("couponMsg");
 
+  const accountBtn = document.getElementById("accountBtn");
+  const accountMenu = document.getElementById("accountMenu");
+
   let selectedProduct = null;
   let finalPrice = 0;
   let allProducts = [];
 
-  // ===== LOAD PRODUCTS =====
+  /* ===== Account Dropdown ===== */
+  accountBtn.onclick = () => {
+    accountMenu.classList.toggle("hidden");
+  };
+
+  window.logout = () => {
+    localStorage.removeItem("token");
+    location.reload();
+  };
+
+  /* ===== Load Products ===== */
   async function loadProducts() {
-    try {
-      const res = await fetch("/api/products");
-      const products = await res.json();
-
-      if (!Array.isArray(products)) {
-        productsDiv.innerHTML = "<p>خطأ في تحميل المنتجات</p>";
-        return;
-      }
-
-      allProducts = products;
-      renderProducts(products);
-
-    } catch (err) {
-      console.error(err);
-      productsDiv.innerHTML = "<p>فشل تحميل المنتجات</p>";
-    }
+    const res = await fetch("/api/products");
+    const products = await res.json();
+    allProducts = products;
+    renderProducts(products);
   }
 
-  // ===== RENDER =====
   function renderProducts(list) {
     productsDiv.innerHTML = "";
 
     if (list.length === 0) {
-      productsDiv.innerHTML = "<p>لا توجد منتجات</p>";
+      productsDiv.innerHTML = "<p>No products available</p>";
       return;
     }
 
@@ -47,62 +46,49 @@ document.addEventListener("DOMContentLoaded", () => {
         <h3>${p.name}</h3>
         <p>${p.description || ""}</p>
         <p><b>${p.price} SAR</b></p>
-        <button>شراء</button>
+        <button class="primary">Buy</button>
       `;
       div.querySelector("button").onclick = () => openOrder(p);
       productsDiv.appendChild(div);
     });
   }
 
-  // ===== FILTER CATEGORY =====
-  window.filterCategory = function (cat) {
-    if (cat === "ALL") {
-      renderProducts(allProducts);
-    } else {
-      renderProducts(allProducts.filter(p => p.category === cat));
-    }
+  window.filterCategory = cat => {
+    if (cat === "ALL") renderProducts(allProducts);
+    else renderProducts(allProducts.filter(p => p.category === cat));
   };
 
-  // ===== OPEN ORDER =====
   function openOrder(product) {
     selectedProduct = product;
     finalPrice = product.price;
-
-    priceInfo.innerText = `السعر: ${finalPrice} SAR`;
-    couponInput.value = "";
+    priceInfo.innerText = `Price: ${finalPrice} SAR`;
     couponMsg.innerText = "";
-
+    couponInput.value = "";
     modal.classList.remove("hidden");
   }
 
-  // ===== APPLY COUPON =====
-  window.applyCoupon = async function () {
+  window.applyCoupon = async () => {
     const code = couponInput.value.trim();
     if (!code) return;
 
     const res = await fetch("/api/coupon/validate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        code,
-        price: selectedProduct.price
-      })
+      body: JSON.stringify({ code, price: selectedProduct.price })
     });
 
     const data = await res.json();
-
     if (!data.valid) {
-      couponMsg.innerText = "كود الخصم غير صالح";
+      couponMsg.innerText = "Invalid code";
       return;
     }
 
     finalPrice = data.finalPrice;
-    priceInfo.innerText = `السعر بعد الخصم: ${finalPrice} SAR`;
-    couponMsg.innerText = "تم تطبيق الخصم بنجاح";
+    priceInfo.innerText = `Price after discount: ${finalPrice} SAR`;
+    couponMsg.innerText = "Discount applied";
   };
 
-  // ===== CONFIRM ORDER =====
-  window.confirmOrder = async function () {
+  window.confirmOrder = async () => {
     await fetch("/api/order", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -112,15 +98,13 @@ document.addEventListener("DOMContentLoaded", () => {
       })
     });
 
-    alert("تم إنشاء الطلب بالسعر: " + finalPrice + " SAR");
+    alert("Order created successfully");
     closeModal();
   };
 
-  // ===== CLOSE MODAL =====
-  window.closeModal = function () {
+  window.closeModal = () => {
     modal.classList.add("hidden");
   };
 
-  // ===== START =====
   loadProducts();
 });
