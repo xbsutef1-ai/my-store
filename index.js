@@ -1,6 +1,6 @@
 // ===============================
 // GLOM STORE - BACKEND (index.js)
-// Auth + OTP Verify + Outlook SMTP
+// Brevo SMTP + OTP Verify + Auth
 // ===============================
 
 require("dotenv").config();
@@ -33,15 +33,15 @@ mongoose
   });
 
 // ===============================
-// Mail (Outlook SMTP)
+// Mail (BREVO SMTP) ✅
 // ===============================
 const transporter = nodemailer.createTransport({
-  host: process.env.MAIL_HOST, // smtp.office365.com
-  port: Number(process.env.MAIL_PORT), // 587
+  host: process.env.MAIL_HOST,           // smtp-relay.brevo.com
+  port: Number(process.env.MAIL_PORT),   // 587
   secure: false,
   auth: {
-    user: process.env.MAIL_USER, // outlook email
-    pass: process.env.MAIL_PASS  // email password
+    user: process.env.MAIL_USER,         // apikey
+    pass: process.env.MAIL_PASS          // Brevo API Key
   }
 });
 
@@ -54,7 +54,6 @@ const UserSchema = new mongoose.Schema({
   password: String,
 
   verified: { type: Boolean, default: false },
-
   verifyCodeHash: String,
   verifyCodeExpires: Date,
 
@@ -97,7 +96,7 @@ function emailTemplate(code) {
 }
 
 // ===============================
-// Register (send OTP)
+// Register (Send OTP)
 // ===============================
 app.post("/api/register", async (req, res) => {
   try {
@@ -122,11 +121,11 @@ app.post("/api/register", async (req, res) => {
       password: hash,
       verified: false,
       verifyCodeHash: codeHash,
-      verifyCodeExpires: Date.now() + 10 * 60 * 1000 // 10 minutes
+      verifyCodeExpires: Date.now() + 10 * 60 * 1000
     });
 
     await transporter.sendMail({
-      from: `"GLOM Store" <${process.env.MAIL_USER}>`,
+      from: `"GLOM Store" <no-reply@glomstore.com>`,
       to: email,
       subject: "Verify your email - GLOM Store",
       html: emailTemplate(code)
@@ -177,7 +176,7 @@ app.post("/api/verify", async (req, res) => {
 });
 
 // ===============================
-// Login (blocked if not verified)
+// Login (Blocked if not verified)
 // ===============================
 app.post("/api/login", async (req, res) => {
   try {
@@ -212,7 +211,7 @@ app.post("/api/login", async (req, res) => {
 });
 
 // ===============================
-// Serve frontend
+// Frontend fallback
 // ===============================
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
