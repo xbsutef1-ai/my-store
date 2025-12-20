@@ -2,8 +2,7 @@
 <html lang="ar">
 <head>
   <meta charset="UTF-8">
-  <title>Login - GLOM Store</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Login</title>
   <link rel="stylesheet" href="theme.css">
 </head>
 <body>
@@ -11,7 +10,6 @@
 <div class="auth-wrap">
   <div class="auth-box">
     <h2>Login</h2>
-    <p>Access your account</p>
 
     <input id="email" placeholder="Email">
     <input id="password" type="password" placeholder="Password">
@@ -21,49 +19,31 @@
     <div class="auth-msg" id="msg"></div>
 
     <div class="auth-link">
-      No account? <a href="/register.html">Register</a>
+      Not verified? <a href="/verify.html">Verify Email</a>
     </div>
   </div>
 </div>
 
 <script>
 const msg = document.getElementById("msg");
-const loginBtn = document.getElementById("loginBtn");
-
-loginBtn.addEventListener("click", async () => {
+document.getElementById("loginBtn").onclick = async () => {
   msg.textContent = "";
-
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value;
-
-  if (!email || !password) {
-    msg.textContent = "Please fill all fields";
-    return;
-  }
-
   const res = await fetch("/api/login", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password })
+    body: JSON.stringify({
+      email: email.value.trim(),
+      password: password.value
+    })
   });
-
-  const data = await res.json().catch(() => ({}));
-
-  if (!res.ok) {
-    if (data.error === "NOT_VERIFIED") {
-      msg.innerHTML = `
-        Account not verified.<br>
-        <a href="/verify.html" style="color:#b66bff">Verify now</a>
-      `;
-      return;
-    }
+  const data = await res.json().catch(()=>({}));
+  if(!res.ok){
     msg.textContent = data.error || "Login failed";
     return;
   }
-
   localStorage.setItem("token", data.token);
   location.href = "/";
-});
+};
 </script>
 
 </body>
