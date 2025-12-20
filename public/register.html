@@ -13,6 +13,7 @@
     <h2>Create Account</h2>
     <p>Join GLOM Store</p>
 
+    <input id="name" placeholder="Username">
     <input id="email" placeholder="Email">
     <input id="password" type="password" placeholder="Password">
 
@@ -28,19 +29,24 @@
 
 <script>
 const msg=document.getElementById("msg");
+
 regBtn.onclick=async()=>{
   msg.textContent="";
   const res=await fetch("/api/register",{
     method:"POST",
     headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify({ email:email.value.trim(), password:password.value })
+    body:JSON.stringify({
+      name: name.value.trim(),
+      email: email.value.trim(),
+      password: password.value
+    })
   });
   const data=await res.json().catch(()=>({}));
   if(!res.ok){
     msg.textContent=data.error||"Register failed";
     return;
   }
-  msg.textContent="Check your email for verification code.";
+  msg.textContent="Account created. Check your email for verification.";
 };
 </script>
 </body>
