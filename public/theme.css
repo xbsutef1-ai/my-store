@@ -1,0 +1,199 @@
+/* ===============================
+   GLOM STORE - MASTER THEME
+   =============================== */
+
+:root {
+  --bg-main: radial-gradient(circle at top, #120000, #050000 70%);
+  --bg-card: linear-gradient(180deg, #0f0f0f, #060606);
+  --bg-header: linear-gradient(180deg, #140000, #080000);
+  --bg-button: linear-gradient(180deg, #a00000, #700000);
+  --bg-button-hover: linear-gradient(180deg, #d00000, #900000);
+  --border-red: #400;
+  --text-main: #eee;
+  --text-accent: #ff4d4d;
+}
+
+/* ===== Reset ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", Tahoma, sans-serif;
+}
+
+body {
+  background: var(--bg-main);
+  color: var(--text-main);
+  min-height: 100vh;
+}
+
+/* ===== Header ===== */
+.header {
+  text-align: center;
+  padding: 45px 20px;
+  background: var(--bg-header);
+  border-bottom: 1px solid var(--border-red);
+}
+
+.header h1 {
+  font-size: 42px;
+  letter-spacing: 2px;
+}
+
+.header span {
+  color: var(--text-accent);
+}
+
+.header p {
+  opacity: 0.8;
+}
+
+/* ===== Navigation ===== */
+.nav {
+  display: flex;
+  justify-content: center;
+  gap: 25px;
+  padding: 15px;
+}
+
+.nav a {
+  color: var(--text-main);
+  text-decoration: none;
+  font-weight: bold;
+  transition: 0.2s;
+}
+
+.nav a:hover {
+  color: var(--text-accent);
+}
+
+/* ===== Layout ===== */
+.container {
+  padding: 40px;
+}
+
+.products {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 28px;
+}
+
+/* ===== Cards ===== */
+.product {
+  background: var(--bg-card);
+  border: 1px solid var(--border-red);
+  border-radius: 12px;
+  padding: 20px;
+  transition: 0.25s;
+}
+
+.product:hover {
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 0 25px rgba(255,0,0,0.35);
+}
+
+.product h3 {
+  color: var(--text-accent);
+  margin-bottom: 10px;
+}
+
+.product p {
+  font-size: 14px;
+  opacity: 0.85;
+}
+
+/* ===== Buttons ===== */
+button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 12px;
+  background: var(--bg-button);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  transition: 0.15s;
+}
+
+button:hover {
+  background: var(--bg-button-hover);
+}
+
+button:active {
+  transform: scale(0.94);
+  box-shadow: inset 0 0 15px rgba(0,0,0,0.7);
+}
+
+/* ===== Forms ===== */
+input, textarea, select {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  border-radius: 6px;
+  border: none;
+}
+
+/* ===== Modal ===== */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.hidden {
+  display: none;
+}
+
+.modal-box {
+  background: #0b0b0b;
+  border: 1px solid #500;
+  padding: 25px;
+  border-radius: 14px;
+  width: 360px;
+  animation: pop 0.3s ease;
+}
+
+/* ===== Admin ===== */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px,1fr));
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+.stats div {
+  background: var(--bg-card);
+  border: 1px solid var(--border-red);
+  padding: 15px;
+  border-radius: 10px;
+  text-align: center;
+}
+
+/* ===== Discord Button ===== */
+.discord {
+  position: fixed;
+  bottom: 22px;
+  right: 22px;
+  background: #5865F2;
+  padding: 14px 22px;
+  border-radius: 30px;
+  color: white;
+  text-decoration: none;
+}
+
+/* ===== Background Animation Canvas ===== */
+#bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+}
+
+/* ===== Animations ===== */
+@keyframes pop {
+  from { transform: scale(0.85); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
