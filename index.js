@@ -1,230 +1,133 @@
-// ======================================
-// GLOM Store - FULL Production index.js
-// ======================================
-
 require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
-const path = require("path");
-const crypto = require("crypto");
-const rateLimit = require("express-rate-limit");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const nodemailer = require("nodemailer");
 
 const app = express();
-const PORT = process.env.PORT || 3000;
-
-// ======================================
-// Middleware
-// ======================================
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static("public"));
 
-app.use(
-  rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 200,
-  })
-);
+/* ===== Mongo ===== */
+mongoose.connect(process.env.MONGO_URI);
 
-// ======================================
-// MongoDB
-// ======================================
-mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => console.log("MongoDB Connected"))
-  .catch((err) => {
-    console.error("Mongo Error:", err);
-    process.exit(1);
-  });
+/* ===== Mail ===== */
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.MAIL_USER,
+    pass: process.env.MAIL_PASS,
+  },
+});
 
-// ======================================
-// Schemas
-// ======================================
-const ProductSchema = new mongoose.Schema({
+/* ===== User Schema ===== */
+const UserSchema = new mongoose.Schema({
   name: String,
-  description: String,
-  price: Number,
-  active: { type: Boolean, default: true },
-  createdAt: { type: Date, default: Date.now },
+  email: { type: String, unique: true },
+  password: String,
+  verified: { type: Boolean, default: false },
+  verifyCodeHash: String,
+  verifyCodeExpires: Date,
 });
+const User = mongoose.model("User", UserSchema);
 
-const CouponSchema = new mongoose.Schema({
-  code: String,
-  type: String, // percent | fixed
-  value: Number,
-  maxUses: Number,
-  used: { type: Number, default: 0 },
-  expiresAt: Date,
-  active: { type: Boolean, default: true },
-  createdAt: { type: Date, default: Date.now },
-});
-
-const OrderSchema = new mongoose.Schema({
-  orderId: String,
-  productId: mongoose.Schema.Types.ObjectId,
-  originalAmount: Number,
-  finalAmount: Number,
-  couponCode: String,
-  createdAt: { type: Date, default: Date.now },
-});
-
-const Product = mongoose.model("Product", ProductSchema);
-const Coupon = mongoose.model("Coupon", CouponSchema);
-const Order = mongoose.model("Order", OrderSchema);
-
-// ======================================
-// Helpers
-// ======================================
-function applyCoupon(amount, coupon) {
-  let newAmount = amount;
-
-  if (coupon.type === "percent") {
-    newAmount = amount - (amount * coupon.value) / 100;
-  } else if (coupon.type === "fixed") {
-    newAmount = amount - coupon.value;
-  }
-
-  return newAmount < 0 ? 0 : Math.round(newAmount);
+/* ===== Helpers ===== */
+function generateOTP() {
+  return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
-function adminAuth(req, res, next) {
-  const key = req.headers["x-admin-key"];
-  if (!key || key !== process.env.ADMIN_PASSWORD) {
-    return res.sendStatus(401);
-  }
-  next();
+function emailTemplate(code) {
+  return `
+  <div style="font-family:Segoe UI;background:#05020a;padding:30px;color:#f4ecff">
+    <div style="max-width:420px;margin:auto;background:#12001f;border-radius:16px;padding:24px">
+      <h2 style="color:#b66bff;text-align:center">GLOM Store</h2>
+      <p style="text-align:center;color:#b9a9d8">Email Verification Code</p>
+      <div style="margin:24px auto;width:fit-content;
+        padding:14px 24px;font-size:26px;letter-spacing:6px;
+        background:#1a0033;border-radius:12px;color:#fff">
+        ${code}
+      </div>
+      <p style="font-size:13px;color:#b9a9d8;text-align:center">
+        Code expires in 10 minutes
+      </p>
+    </div>
+  </div>`;
 }
 
-// ======================================
-// Routes
-// ======================================
+/* ===== Register ===== */
+app.post("/api/register", async (req, res) => {
+  const { name, email, password } = req.body;
+  if (!name || !email || !password)
+    return res.status(400).json({ error: "All fields required" });
 
-// ---------- Health ----------
-app.get("/api/health", (req, res) => {
-  res.json({ status: "OK", store: "GLOM Store" });
-});
+  const exists = await User.findOne({ email });
+  if (exists) return res.status(400).json({ error: "Email already exists" });
 
-// ---------- Products ----------
-app.get("/api/products", async (req, res) => {
-  const products = await Product.find({ active: true });
-  res.json(products);
-});
+  const hash = await bcrypt.hash(password, 10);
+  const code = generateOTP();
+  const codeHash = await bcrypt.hash(code, 10);
 
-// ---------- Coupons (Validate) ----------
-app.post("/api/coupon/validate", async (req, res) => {
-  const { code, price } = req.body;
-
-  const coupon = await Coupon.findOne({
-    code: code.toUpperCase(),
-    active: true,
+  await User.create({
+    name,
+    email,
+    password: hash,
+    verified: false,
+    verifyCodeHash: codeHash,
+    verifyCodeExpires: Date.now() + 10 * 60 * 1000,
   });
 
-  if (!coupon) return res.json({ valid: false });
-
-  if (coupon.expiresAt && coupon.expiresAt < new Date())
-    return res.json({ valid: false });
-
-  if (coupon.maxUses && coupon.used >= coupon.maxUses)
-    return res.json({ valid: false });
-
-  const finalPrice = applyCoupon(price, coupon);
-  res.json({ valid: true, finalPrice });
-});
-
-// ---------- Orders ----------
-app.post("/api/order", async (req, res) => {
-  const { productId, couponCode } = req.body;
-  const product = await Product.findById(productId);
-  if (!product) return res.status(404).json({ error: "Product not found" });
-
-  let finalPrice = product.price;
-  let appliedCoupon = null;
-
-  if (couponCode) {
-    const coupon = await Coupon.findOne({
-      code: couponCode.toUpperCase(),
-      active: true,
-    });
-
-    if (
-      coupon &&
-      (!coupon.expiresAt || coupon.expiresAt >= new Date()) &&
-      (!coupon.maxUses || coupon.used < coupon.maxUses)
-    ) {
-      finalPrice = applyCoupon(product.price, coupon);
-      coupon.used += 1;
-      await coupon.save();
-      appliedCoupon = coupon.code;
-    }
-  }
-
-  const order = new Order({
-    orderId: crypto.randomUUID(),
-    productId,
-    originalAmount: product.price,
-    finalAmount: finalPrice,
-    couponCode: appliedCoupon,
+  await transporter.sendMail({
+    from: `"GLOM Store" <${process.env.MAIL_USER}>`,
+    to: email,
+    subject: "Verify your email",
+    html: emailTemplate(code),
   });
-
-  await order.save();
-
-  res.json({
-    success: true,
-    order,
-  });
-});
-
-// ======================================
-// ADMIN – Coupons Management
-// ======================================
-
-// Get all coupons
-app.get("/api/admin/coupons", adminAuth, async (req, res) => {
-  const coupons = await Coupon.find().sort({ createdAt: -1 });
-  res.json(coupons);
-});
-
-// Create coupon
-app.post("/api/admin/coupons", adminAuth, async (req, res) => {
-  const coupon = new Coupon({
-    code: req.body.code.toUpperCase(),
-    type: req.body.type,
-    value: req.body.value,
-    maxUses: req.body.maxUses || null,
-    expiresAt: req.body.expiresAt || null,
-  });
-
-  await coupon.save();
-  res.json({ success: true });
-});
-
-// Toggle coupon
-app.post("/api/admin/coupons/:id/toggle", adminAuth, async (req, res) => {
-  const coupon = await Coupon.findById(req.params.id);
-  if (!coupon) return res.sendStatus(404);
-
-  coupon.active = !coupon.active;
-  await coupon.save();
 
   res.json({ success: true });
 });
 
-// Delete coupon
-app.delete("/api/admin/coupons/:id", adminAuth, async (req, res) => {
-  await Coupon.findByIdAndDelete(req.params.id);
+/* ===== Verify ===== */
+app.post("/api/verify", async (req, res) => {
+  const { email, code } = req.body;
+  const user = await User.findOne({ email });
+  if (!user) return res.status(404).json({ error: "User not found" });
+
+  if (user.verified) return res.json({ success: true });
+
+  if (user.verifyCodeExpires < Date.now())
+    return res.status(400).json({ error: "Code expired" });
+
+  const ok = await bcrypt.compare(code, user.verifyCodeHash);
+  if (!ok) return res.status(400).json({ error: "Invalid code" });
+
+  user.verified = true;
+  user.verifyCodeHash = null;
+  user.verifyCodeExpires = null;
+  await user.save();
+
   res.json({ success: true });
 });
 
-// ======================================
-// Frontend Fallback
-// ======================================
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
+/* ===== Login ===== */
+app.post("/api/login", async (req, res) => {
+  const { email, password } = req.body;
+  const user = await User.findOne({ email });
+  if (!user) return res.status(401).json({ error: "Invalid credentials" });
+
+  const ok = await bcrypt.compare(password, user.password);
+  if (!ok) return res.status(401).json({ error: "Invalid credentials" });
+
+  if (!user.verified)
+    return res.status(403).json({ error: "NOT_VERIFIED" });
+
+  const token = jwt.sign(
+    { id: user._id, email: user.email },
+    process.env.JWT_SECRET,
+    { expiresIn: "7d" }
+  );
+
+  res.json({ token });
 });
 
-// ======================================
-// Start Server
-// ======================================
-app.listen(PORT, () => {
-  console.log(`GLOM Store running on port ${PORT}`);
-});
+app.listen(3000, () => console.log("Server running"));
