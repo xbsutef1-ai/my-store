@@ -125,7 +125,7 @@ app.post("/api/register", async (req, res) => {
     });
 
     await transporter.sendMail({
-      from: `"GLOM Store" <no-reply@glomstore.com>`,
+from: `"GLOM Store" <pixelframe89@gmail.com>` 
       to: email,
       subject: "Verify your email - GLOM Store",
       html: emailTemplate(code)
@@ -221,3 +221,4 @@ app.get("*", (req, res) => {
 app.listen(PORT, () => {
   console.log("GLOM Store backend running on port", PORT);
 });
+
