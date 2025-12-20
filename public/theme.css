@@ -3,14 +3,14 @@
    =============================== */
 
 :root {
-  --bg-main: radial-gradient(circle at top, #120000, #050000 70%);
-  --bg-card: linear-gradient(180deg, #0f0f0f, #060606);
-  --bg-header: linear-gradient(180deg, #140000, #080000);
-  --bg-button: linear-gradient(180deg, #a00000, #700000);
-  --bg-button-hover: linear-gradient(180deg, #d00000, #900000);
-  --border-red: #400;
+  --bg-main: radial-gradient(circle at top, #140000, #050000 70%);
+  --bg-card: linear-gradient(180deg, #121212, #070707);
+  --bg-header: linear-gradient(180deg, #180000, #080000);
+  --accent: #ff3b3b;
+  --accent-soft: rgba(255, 59, 59, 0.4);
+  --border: #300;
   --text-main: #eee;
-  --text-accent: #ff4d4d;
+  --text-muted: #aaa;
 }
 
 /* ===== Reset ===== */
@@ -29,42 +29,99 @@ body {
 
 /* ===== Header ===== */
 .header {
-  text-align: center;
-  padding: 45px 20px;
   background: var(--bg-header);
-  border-bottom: 1px solid var(--border-red);
+  border-bottom: 1px solid var(--border);
+}
+
+.header-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 28px 40px;
 }
 
 .header h1 {
-  font-size: 42px;
+  font-size: 36px;
   letter-spacing: 2px;
 }
 
 .header span {
-  color: var(--text-accent);
+  color: var(--accent);
 }
 
-.header p {
-  opacity: 0.8;
+/* ===== Account ===== */
+.account {
+  position: relative;
 }
 
-/* ===== Navigation ===== */
-.nav {
-  display: flex;
-  justify-content: center;
-  gap: 25px;
-  padding: 15px;
-}
-
-.nav a {
-  color: var(--text-main);
-  text-decoration: none;
-  font-weight: bold;
+.account img {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid var(--accent-soft);
   transition: 0.2s;
 }
 
-.nav a:hover {
-  color: var(--text-accent);
+.account img:hover {
+  box-shadow: 0 0 12px var(--accent-soft);
+}
+
+/* ===== Account Menu ===== */
+.account-menu {
+  position: absolute;
+  right: 0;
+  top: 56px;
+  background: #0b0b0b;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  width: 180px;
+  overflow: hidden;
+  z-index: 100;
+}
+
+.account-menu a {
+  display: block;
+  padding: 12px 14px;
+  color: var(--text-main);
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.account-menu a:hover {
+  background: #1a0000;
+}
+
+.account-menu hr {
+  border: none;
+  border-top: 1px solid #300;
+}
+
+/* ===== Categories ===== */
+.category-tabs {
+  display: flex;
+  gap: 20px;
+  padding: 16px 40px;
+}
+
+.tab {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 14px;
+  cursor: pointer;
+  padding-bottom: 6px;
+  border-bottom: 2px solid transparent;
+  transition: 0.2s;
+}
+
+.tab:hover {
+  color: #fff;
+}
+
+.tab.active {
+  color: var(--accent);
+  border-bottom: 2px solid var(--accent);
 }
 
 /* ===== Layout ===== */
@@ -78,28 +135,28 @@ body {
   gap: 28px;
 }
 
-/* ===== Cards ===== */
+/* ===== Product Card ===== */
 .product {
   background: var(--bg-card);
-  border: 1px solid var(--border-red);
-  border-radius: 12px;
-  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 22px;
   transition: 0.25s;
 }
 
 .product:hover {
-  transform: translateY(-6px) scale(1.02);
-  box-shadow: 0 0 25px rgba(255,0,0,0.35);
+  transform: translateY(-6px);
+  box-shadow: 0 0 28px rgba(255, 59, 59, 0.35);
 }
 
 .product h3 {
-  color: var(--text-accent);
+  color: var(--accent);
   margin-bottom: 10px;
 }
 
 .product p {
   font-size: 14px;
-  opacity: 0.85;
+  color: var(--text-muted);
 }
 
 /* ===== Buttons ===== */
@@ -107,30 +164,29 @@ button {
   width: 100%;
   padding: 12px;
   margin-top: 12px;
-  background: var(--bg-button);
+  border-radius: 10px;
   border: none;
-  border-radius: 8px;
-  color: white;
   cursor: pointer;
+  font-weight: bold;
   transition: 0.15s;
 }
 
+button.primary {
+  background: linear-gradient(180deg, #ff3b3b, #b00000);
+  color: #fff;
+}
+
+button.secondary {
+  background: #222;
+  color: #ccc;
+}
+
 button:hover {
-  background: var(--bg-button-hover);
+  filter: brightness(1.1);
 }
 
 button:active {
-  transform: scale(0.94);
-  box-shadow: inset 0 0 15px rgba(0,0,0,0.7);
-}
-
-/* ===== Forms ===== */
-input, textarea, select {
-  width: 100%;
-  padding: 10px;
-  margin-top: 10px;
-  border-radius: 6px;
-  border: none;
+  transform: scale(0.96);
 }
 
 /* ===== Modal ===== */
@@ -141,7 +197,6 @@ input, textarea, select {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 100;
 }
 
 .hidden {
@@ -150,50 +205,30 @@ input, textarea, select {
 
 .modal-box {
   background: #0b0b0b;
-  border: 1px solid #500;
-  padding: 25px;
-  border-radius: 14px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 28px;
   width: 360px;
-  animation: pop 0.3s ease;
 }
 
-/* ===== Admin ===== */
-.stats {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px,1fr));
-  gap: 15px;
-  margin-bottom: 25px;
+/* ===== Inputs ===== */
+input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  margin-top: 10px;
 }
 
-.stats div {
-  background: var(--bg-card);
-  border: 1px solid var(--border-red);
-  padding: 15px;
-  border-radius: 10px;
-  text-align: center;
-}
-
-/* ===== Discord Button ===== */
+/* ===== Discord ===== */
 .discord {
   position: fixed;
   bottom: 22px;
   right: 22px;
   background: #5865F2;
-  padding: 14px 22px;
+  padding: 14px 24px;
   border-radius: 30px;
   color: white;
   text-decoration: none;
-}
-
-/* ===== Background Animation Canvas ===== */
-#bg {
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-}
-
-/* ===== Animations ===== */
-@keyframes pop {
-  from { transform: scale(0.85); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
+  font-weight: bold;
 }
