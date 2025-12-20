@@ -11,7 +11,7 @@
 <div class="auth-wrap">
   <div class="auth-box">
     <h2>Login</h2>
-    <p>Access your GLOM account</p>
+    <p>Access your account</p>
 
     <input id="email" placeholder="Email">
     <input id="password" type="password" placeholder="Password">
@@ -27,17 +27,21 @@
 </div>
 
 <script>
-const msg = document.getElementById("msg");
-loginBtn.onclick = async () => {
+const msg=document.getElementById("msg");
+
+loginBtn.onclick=async()=>{
   msg.textContent="";
-  const res = await fetch("/api/login",{
+  const res=await fetch("/api/login",{
     method:"POST",
     headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify({ email:email.value.trim(), password:password.value })
+    body:JSON.stringify({
+      email: email.value.trim(),
+      password: password.value
+    })
   });
-  const data = await res.json().catch(()=>({}));
+  const data=await res.json().catch(()=>({}));
   if(!res.ok){
-    msg.textContent = data.error || "Login failed";
+    msg.textContent=data.error||"Invalid email or password";
     return;
   }
   localStorage.setItem("token",data.token);
