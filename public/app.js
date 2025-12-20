@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-  // ================== DOM ==================
+  // ===== DOM =====
   const productsDiv = document.getElementById("products");
   const modal = document.getElementById("modal");
   const priceInfo = document.getElementById("priceInfo");
@@ -9,33 +9,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let selectedProduct = null;
   let finalPrice = 0;
+  let allProducts = [];
 
-  // ================== LOAD PRODUCTS ==================
+  // ===== LOAD PRODUCTS =====
   async function loadProducts() {
     try {
       const res = await fetch("/api/products");
       const products = await res.json();
 
-      productsDiv.innerHTML = "";
-
-      if (!Array.isArray(products) || products.length === 0) {
-        productsDiv.innerHTML = "<p>لا توجد منتجات حاليًا</p>";
+      if (!Array.isArray(products)) {
+        productsDiv.innerHTML = "<p>خطأ في تحميل المنتجات</p>";
         return;
       }
 
-      products.forEach(p => {
-        const div = document.createElement("div");
-        div.className = "product";
-        div.innerHTML = `
-          <h3>${p.name}</h3>
-          <p>${p.description || ""}</p>
-          <p><b>${p.price} SAR</b></p>
-          <button>شراء</button>
-        `;
-
-        div.querySelector("button").onclick = () => openOrder(p);
-        productsDiv.appendChild(div);
-      });
+      allProducts = products;
+      renderProducts(products);
 
     } catch (err) {
       console.error(err);
@@ -43,19 +31,51 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // ================== OPEN ORDER ==================
+  // ===== RENDER =====
+  function renderProducts(list) {
+    productsDiv.innerHTML = "";
+
+    if (list.length === 0) {
+      productsDiv.innerHTML = "<p>لا توجد منتجات</p>";
+      return;
+    }
+
+    list.forEach(p => {
+      const div = document.createElement("div");
+      div.className = "product";
+      div.innerHTML = `
+        <h3>${p.name}</h3>
+        <p>${p.description || ""}</p>
+        <p><b>${p.price} SAR</b></p>
+        <button>شراء</button>
+      `;
+      div.querySelector("button").onclick = () => openOrder(p);
+      productsDiv.appendChild(div);
+    });
+  }
+
+  // ===== FILTER CATEGORY =====
+  window.filterCategory = function (cat) {
+    if (cat === "ALL") {
+      renderProducts(allProducts);
+    } else {
+      renderProducts(allProducts.filter(p => p.category === cat));
+    }
+  };
+
+  // ===== OPEN ORDER =====
   function openOrder(product) {
     selectedProduct = product;
     finalPrice = product.price;
 
     priceInfo.innerText = `السعر: ${finalPrice} SAR`;
-    couponMsg.innerText = "";
     couponInput.value = "";
+    couponMsg.innerText = "";
 
     modal.classList.remove("hidden");
   }
 
-  // ================== APPLY COUPON ==================
+  // ===== APPLY COUPON =====
   window.applyCoupon = async function () {
     const code = couponInput.value.trim();
     if (!code) return;
@@ -81,7 +101,7 @@ document.addEventListener("DOMContentLoaded", () => {
     couponMsg.innerText = "تم تطبيق الخصم بنجاح";
   };
 
-  // ================== CONFIRM ORDER ==================
+  // ===== CONFIRM ORDER =====
   window.confirmOrder = async function () {
     await fetch("/api/order", {
       method: "POST",
@@ -96,11 +116,11 @@ document.addEventListener("DOMContentLoaded", () => {
     closeModal();
   };
 
-  // ================== CLOSE MODAL ==================
+  // ===== CLOSE MODAL =====
   window.closeModal = function () {
     modal.classList.add("hidden");
   };
 
-  // ================== START ==================
+  // ===== START =====
   loadProducts();
 });
