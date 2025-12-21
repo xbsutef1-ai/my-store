@@ -11,7 +11,6 @@
 <div class="auth-wrap">
   <div class="auth-box">
     <h2>Create Account</h2>
-    <p>Join GLOM Store</p>
 
     <input id="nameInput" placeholder="Username">
     <input id="emailInput" placeholder="Email">
@@ -20,48 +19,38 @@
     <button class="btn" id="registerBtn">Register</button>
 
     <div class="auth-msg" id="msg"></div>
-
-    <div class="auth-link">
-      Already registered? <a href="/verify.html">Verify Email</a>
-    </div>
   </div>
 </div>
 
 <script>
-const registerBtn = document.getElementById("registerBtn");
-const msg = document.getElementById("msg");
-
-registerBtn.addEventListener("click", async () => {
-  msg.textContent = "";
+document.getElementById("registerBtn").onclick = async () => {
+  const msg = document.getElementById("msg");
 
   const name = document.getElementById("nameInput").value.trim();
   const email = document.getElementById("emailInput").value.trim();
   const password = document.getElementById("passwordInput").value;
 
   if (!name || !email || !password) {
-    msg.textContent = "Please fill all fields";
+    msg.textContent = "Fill all fields";
     return;
   }
 
-  try {
-    const res = await fetch("/api/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, password })
-    });
+  const res = await fetch("/api/register", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name, email, password })
+  });
 
-    const data = await res.json().catch(() => ({}));
+  const data = await res.json().catch(() => ({}));
 
-    if (!res.ok) {
-      msg.textContent = data.error || "Register failed";
-      return;
-    }
-
-    msg.textContent = "Verification code sent to your email";
-  } catch (err) {
-    msg.textContent = "Network error";
+  if (!res.ok) {
+    msg.textContent = data.error || "Register failed";
+    return;
   }
-});
+
+  // ✅ تحويل تلقائي
+  location.href = `/verify.html?email=${encodeURIComponent(email)}`;
+};
 </script>
 
 </body>
