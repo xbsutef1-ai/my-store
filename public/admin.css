@@ -1,0 +1,45 @@
+.admin-body { background:#0b0614; color:#eee; min-height:100vh; }
+
+.admin-top{
+  display:flex; justify-content:space-between; align-items:center;
+  padding:16px 22px; border-bottom:1px solid #3b1a6a;
+  background:linear-gradient(180deg,#16072b,#0c0418);
+}
+.brand{ font-size:20px; letter-spacing:1px }
+.brand span{ color:#b66bff }
+
+.admin-wrap{ display:grid; grid-template-columns:220px 1fr; }
+
+.admin-side{
+  background:#0f071d; border-right:1px solid #3b1a6a; padding:12px;
+}
+.side-item{
+  display:block; padding:12px 14px; margin-bottom:8px;
+  border-radius:10px; cursor:pointer; color:#ddd;
+}
+.side-item.active, .side-item:hover{
+  background:#1b0a33; box-shadow:0 0 18px rgba(182,107,255,.35);
+}
+
+.admin-main{ padding:24px }
+.view h2{ margin-bottom:14px }
+
+.cards{ display:grid; grid-template-columns:repeat(3,minmax(160px,1fr)); gap:16px }
+.card{
+  background:#12081f; border:1px solid #3b1a6a; border-radius:14px;
+  padding:18px; text-align:center;
+}
+.glow{ box-shadow:0 0 28px rgba(182,107,255,.25) }
+
+.panel{ display:flex; gap:10px; margin-bottom:14px }
+.list .row{
+  display:flex; justify-content:space-between; align-items:center;
+  padding:12px; margin-bottom:10px; border-radius:12px;
+  background:#12081f; border:1px solid #3b1a6a;
+}
+
+.btn{ padding:10px 14px; border-radius:10px; border:none; cursor:pointer;
+  background:linear-gradient(180deg,#8a3cff,#5b22b5); color:#fff;
+}
+.btn.danger{ background:linear-gradient(180deg,#ff3c6a,#b52244) }
+.hidden{ display:none }
