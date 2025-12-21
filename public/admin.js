@@ -1,51 +1,86 @@
-// حماية
-if (!localStorage.getItem("token")) {
-  location.href = "/login.html";
+const token = localStorage.getItem("token");
+if (!token) location.href = "/login.html";
+
+async function api(url, method="GET", body){
+  const res = await fetch(url,{
+    method,
+    headers:{
+      "Content-Type":"application/json",
+      "Authorization":"Bearer "+token
+    },
+    body: body ? JSON.stringify(body) : null
+  });
+  return res.json();
 }
 
-// Logout
-document.getElementById("logoutBtn").onclick = () => {
-  localStorage.removeItem("token");
-  location.href = "/";
-};
+// ================= OVERVIEW =================
+async function loadOverview(){
+  const d = await api("/api/admin/overview");
+  ovSales.textContent = "$"+d.revenue;
+  ovOrders.textContent = d.orders;
+  ovUsers.textContent = d.users;
+  ovPending.textContent = d.pending;
+}
+loadOverview();
 
-// Sidebar navigation
-document.querySelectorAll(".side-item").forEach(item=>{
-  item.onclick=()=>{
-    document.querySelectorAll(".side-item").forEach(i=>i.classList.remove("active"));
-    item.classList.add("active");
+// ================= PRODUCTS =================
+async function loadProducts(){
+  const p = await api("/api/admin/products");
+  productsList.innerHTML = p.map(x=>`
+    <div class="row">
+      <span>${x.name}</span>
+      <span>$${x.price}</span>
+      <button onclick="deleteProduct('${x._id}')">❌</button>
+    </div>
+  `).join("");
+}
+loadProducts();
 
-    document.querySelectorAll(".view").forEach(v=>v.classList.add("hidden"));
-    document.getElementById(item.dataset.view).classList.remove("hidden");
-  };
-});
-
-// ===== Overview (مرحلة 1 بيانات وهمية) =====
-document.getElementById("ovSales").textContent = "$1,240";
-document.getElementById("ovOrders").textContent = "18";
-document.getElementById("ovUsers").textContent = "9";
-document.getElementById("ovPending").textContent = "3";
-
-// ===== Products =====
-function addProduct(){
-  const name=pName.value, price=pPrice.value;
-  if(!name||!price) return;
-  const row=document.createElement("div");
-  row.className="row";
-  row.innerHTML=`<span>${name}</span><span>$${price}</span>`;
-  productsList.appendChild(row);
-  pName.value=pPrice.value="";
+async function addProduct(){
+  await api("/api/admin/products","POST",{
+    name:pName.value,
+    price:Number(pPrice.value),
+    stock:10
+  });
+  loadProducts();
 }
 
-// ===== Coupons =====
-function addCoupon(){
-  const row=document.createElement("div");
-  row.className="row";
-  row.innerHTML=`<span>${cCode.value}</span><span>${cDiscount.value}%</span>`;
-  couponsList.appendChild(row);
-  cCode.value=cDiscount.value="";
+async function deleteProduct(id){
+  await api("/api/admin/products/"+id,"DELETE");
+  loadProducts();
 }
 
-// ===== Orders / Customers (Placeholder) =====
-ordersList.innerHTML = `<div class="row"><span>#1021</span><span>Pending</span></div>`;
-customersList.innerHTML = `<div class="row"><span>user@email.com</span></div>`;
+// ================= ORDERS =================
+async function loadOrders(){
+  const o = await api("/api/admin/orders");
+  ordersList.innerHTML = o.map(x=>`
+    <div class="row">
+      <span>${x.userEmail}</span>
+      <span>${x.status}</span>
+      <button onclick="deliver('${x._id}')">Deliver</button>
+    </div>
+  `).join("");
+}
+loadOrders();
+
+async function deliver(id){
+  const code = prompt("Delivery code:");
+  await api("/api/admin/orders/"+id+"/status","POST",{
+    status:"delivered",
+    delivery:code
+  });
+  loadOrders();
+}
+
+// ================= CUSTOMERS =================
+async function loadCustomers(){
+  const c = await api("/api/admin/customers");
+  customersList.innerHTML = c.map(x=>`
+    <div class="row">
+      <span>${x.email}</span>
+      <span>${x.orders} orders</span>
+      <span>$${x.total}</span>
+    </div>
+  `).join("");
+}
+loadCustomers();
