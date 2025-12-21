@@ -1,27 +1,19 @@
-:root {
-  --bg-main: radial-gradient(circle at top, #16002b, #05000a 70%);
-  --card-bg: linear-gradient(180deg, #140022, #0b0014);
-  --purple: #b66bff;
-  --purple-glow: rgba(182,107,255,0.45);
-  --border: #3b1a6a;
-  --text-main: #eee;
-}
-
-/* Reset */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: "Segoe UI", Tahoma, sans-serif;
-}
-
 body {
-  background: var(--bg-main);
-  color: var(--text-main);
-  min-height: 100vh;
+  background: radial-gradient(circle at top, #16002b, #05000a 70%);
+  color: #eee;
+  font-family: Segoe UI, Tahoma;
 }
 
-/* Products grid */
+.header {
+  text-align: center;
+  padding: 30px;
+  font-size: 28px;
+}
+
+.header span {
+  color: #b66bff;
+}
+
 .products {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -29,135 +21,25 @@ body {
   padding: 40px;
 }
 
-/* ===============================
-   PRODUCT CARD
-=============================== */
 .product-card {
-  position: relative;
-  background: var(--card-bg);
+  background: linear-gradient(180deg, #140022, #0b0014);
   border-radius: 18px;
   overflow: hidden;
-
-  opacity: 0;
-  transform: translateY(35px) scale(0.95);
-  transition:
-    opacity 0.6s ease,
-    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  padding: 16px;
+  transition: 0.3s;
 }
 
-/* دخول */
-.product-card.show {
-  opacity: 1;
-  transform: translateY(0) scale(1);
+.product-card:hover {
+  box-shadow: 0 0 30px rgba(182,107,255,0.4);
+  transform: translateY(-6px);
 }
 
-/* Glow متحرك */
-.product-card::before {
-  content: "";
-  position: absolute;
-  inset: -2px;
-  background: radial-gradient(
-    circle at var(--x, 50%) var(--y, 50%),
-    var(--purple-glow),
-    transparent 60%
-  );
-  opacity: 0;
-  transition: opacity 0.25s;
-  pointer-events: none;
-}
-
-.product-card::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 18px;
-  box-shadow: 0 0 0 rgba(0,0,0,0);
-  transition: box-shadow 0.25s;
-  pointer-events: none;
-}
-
-/* Hover PC فقط */
-@media (hover: hover) and (pointer: fine) {
-  .product-card:hover {
-    transform: translateY(-8px) scale(1.025);
-  }
-
-  .product-card:hover::before {
-    opacity: 1;
-  }
-
-  .product-card:hover::after {
-    box-shadow:
-      0 0 35px var(--purple-glow),
-      inset 0 0 18px rgba(255,255,255,0.08);
-  }
-}
-
-/* Image */
-.product-card img {
-  width: 100%;
-  height: 160px;
-  object-fit: cover;
-}
-
-/* Content */
-.product-info {
-  padding: 18px;
-}
-
-.product-info h3 {
-  font-size: 19px;
-  margin-bottom: 6px;
-}
-
-.product-info p {
-  font-size: 14px;
-  opacity: 0.8;
-}
-
-/* Plans */
-.plan {
-  margin-top: 10px;
-  padding: 10px;
-  border-radius: 12px;
-  border: 1px solid var(--border);
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-.plan:hover {
-  box-shadow: 0 0 18px var(--purple-glow);
-}
-
-.plan.disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-.plan-stock {
-  font-size: 12px;
-  margin-top: 4px;
-}
-
-/* Buy Button */
 .buy-btn {
   width: 100%;
-  margin-top: 14px;
-  padding: 14px;
-  border-radius: 14px;
-  border: none;
+  padding: 12px;
+  margin-top: 12px;
+  border-radius: 12px;
   background: linear-gradient(180deg, #9b4dff, #6b2bd6);
+  border: none;
   color: #fff;
-  font-weight: bold;
-  cursor: pointer;
-  transition: 0.25s;
-}
-
-.buy-btn:hover:not(:disabled) {
-  box-shadow: 0 0 25px var(--purple-glow);
-}
-
-.buy-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
 }
