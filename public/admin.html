@@ -42,12 +42,18 @@
     <!-- PRODUCTS -->
     <section id="products" class="view hidden">
       <h2>Products</h2>
-      <div class="panel">
+
+      <!-- ADD PRODUCT -->
+      <div class="panel glow">
         <input id="pName" placeholder="Product name">
         <input id="pPrice" placeholder="Price">
-        <button class="btn" onclick="addProduct()">Add</button>
+        <input id="pStock" placeholder="Stock">
+        <input id="pImage" placeholder="Image URL">
+        <button class="btn" onclick="addProduct()">Add Product</button>
       </div>
-      <div id="productsList" class="list"></div>
+
+      <!-- PRODUCTS GRID -->
+      <div id="productsGrid" class="products-grid"></div>
     </section>
 
     <!-- ORDERS -->
