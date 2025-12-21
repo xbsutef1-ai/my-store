@@ -1,86 +1,14 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html>
 <head>
   <meta charset="UTF-8">
   <title>GLOM Dashboard</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="theme.css">
   <link rel="stylesheet" href="admin.css">
 </head>
 <body>
 
-<header class="admin-top">
-  <div class="brand">GLOM <span>Dashboard</span></div>
-  <button id="logoutBtn" class="btn danger">Logout</button>
-</header>
-
-<div class="admin-layout">
-
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <div class="side-item active" data-view="overview">Overview</div>
-    <div class="side-item" data-view="products">Products</div>
-    <div class="side-item" data-view="orders">Orders</div>
-    <div class="side-item" data-view="customers">Customers</div>
-    <div class="side-item" data-view="coupons">Coupons</div>
-  </aside>
-
-  <!-- MAIN -->
-  <main class="admin-main">
-
-    <!-- OVERVIEW -->
-    <section id="overview" class="view">
-      <h2>Overview</h2>
-      <div class="stats">
-        <div class="stat-card glow"><p>Sales</p><h3 id="ovSales">—</h3></div>
-        <div class="stat-card glow"><p>Orders</p><h3 id="ovOrders">—</h3></div>
-        <div class="stat-card glow"><p>Customers</p><h3 id="ovUsers">—</h3></div>
-        <div class="stat-card glow"><p>Pending</p><h3 id="ovPending">—</h3></div>
-      </div>
-    </section>
-
-    <!-- PRODUCTS -->
-    <section id="products" class="view hidden">
-      <h2>Products</h2>
-
-      <!-- ADD PRODUCT -->
-      <div class="panel glow">
-        <input id="pName" placeholder="Product name">
-        <input id="pPrice" placeholder="Price">
-        <input id="pStock" placeholder="Stock">
-        <input id="pImage" placeholder="Image URL">
-        <button class="btn" onclick="addProduct()">Add Product</button>
-      </div>
-
-      <!-- PRODUCTS GRID -->
-      <div id="productsGrid" class="products-grid"></div>
-    </section>
-
-    <!-- ORDERS -->
-    <section id="orders" class="view hidden">
-      <h2>Orders</h2>
-      <div id="ordersList" class="list"></div>
-    </section>
-
-    <!-- CUSTOMERS -->
-    <section id="customers" class="view hidden">
-      <h2>Customers</h2>
-      <div id="customersList" class="list"></div>
-    </section>
-
-    <!-- COUPONS -->
-    <section id="coupons" class="view hidden">
-      <h2>Coupons</h2>
-      <div class="panel">
-        <input id="cCode" placeholder="CODE">
-        <input id="cDiscount" placeholder="Discount %">
-        <button class="btn" onclick="addCoupon()">Add</button>
-      </div>
-      <div id="couponsList" class="list"></div>
-    </section>
-
-  </main>
-</div>
+<h1>GLOM Dashboard</h1>
+<div id="products"></div>
 
 <script src="admin.js"></script>
 </body>
