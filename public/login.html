@@ -2,7 +2,8 @@
 <html lang="ar">
 <head>
   <meta charset="UTF-8">
-  <title>Login</title>
+  <title>Login - GLOM Store</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="theme.css">
 </head>
 <body>
@@ -17,30 +18,33 @@
     <button class="btn" id="loginBtn">Login</button>
 
     <div class="auth-msg" id="msg"></div>
-
-    <div class="auth-link">
-      Not verified? <a href="/verify.html">Verify Email</a>
-    </div>
   </div>
 </div>
 
 <script>
-const msg = document.getElementById("msg");
 document.getElementById("loginBtn").onclick = async () => {
-  msg.textContent = "";
+  const msg = document.getElementById("msg");
+
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+
   const res = await fetch("/api/login", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      email: email.value.trim(),
-      password: password.value
-    })
+    body: JSON.stringify({ email, password })
   });
-  const data = await res.json().catch(()=>({}));
-  if(!res.ok){
+
+  const data = await res.json().catch(() => ({}));
+
+  if (!res.ok) {
+    if (data.error === "NOT_VERIFIED") {
+      location.href = `/verify.html?email=${encodeURIComponent(email)}`;
+      return;
+    }
     msg.textContent = data.error || "Login failed";
     return;
   }
+
   localStorage.setItem("token", data.token);
   location.href = "/";
 };
