@@ -1,43 +1,81 @@
 <!DOCTYPE html>
 <html lang="ar">
 <head>
-  <meta charset="UTF-8">
-  <title>GLOM Store - Admin</title>
- <link rel="stylesheet" href="theme.css">
+  <meta charset="UTF-8" />
+  <title>GLOM Admin</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="theme.css" />
+  <link rel="stylesheet" href="admin.css" />
 </head>
-<body>
+<body class="admin-body">
 
-<header class="header">
-  <h1>GLOM <span>Admin</span></h1>
-  <p>لوحة التحكم</p>
+<header class="admin-top">
+  <div class="brand">GLOM <span>Admin</span></div>
+  <button id="logoutBtn" class="btn danger">Logout</button>
 </header>
 
-<main class="container">
+<div class="admin-wrap">
+  <aside class="admin-side">
+    <a class="side-item active" data-view="overview">Overview</a>
+    <a class="side-item" data-view="products">Products</a>
+    <a class="side-item" data-view="orders">Orders</a>
+    <a class="side-item" data-view="coupons">Coupons</a>
+    <a class="side-item" data-view="users">Users</a>
+  </aside>
 
-  <div class="stats">
-    <div id="statProducts">Products: 0</div>
-    <div id="statOrders">Orders: 0</div>
-    <div id="statRevenue">Revenue: 0 SAR</div>
-  </div>
+  <main class="admin-main">
+    <!-- OVERVIEW -->
+    <section class="view" id="overview">
+      <h2>Overview</h2>
+      <div class="cards">
+        <div class="card glow">
+          <p>Users</p><h3 id="statUsers">—</h3>
+        </div>
+        <div class="card glow">
+          <p>Orders</p><h3 id="statOrders">—</h3>
+        </div>
+        <div class="card glow">
+          <p>Revenue</p><h3 id="statRevenue">—</h3>
+        </div>
+      </div>
+    </section>
 
-  <h2>إضافة منتج</h2>
-  <form id="productForm" class="admin-form">
-    <input id="name" placeholder="اسم المنتج" required>
-    <textarea id="description" placeholder="وصف المنتج"></textarea>
-    <input id="price" type="number" placeholder="السعر" required>
-    <select id="type">
-      <option value="key">Key</option>
-      <option value="account">Account</option>
-    </select>
-    <button type="submit">إضافة المنتج</button>
-  </form>
+    <!-- PRODUCTS -->
+    <section class="view hidden" id="products">
+      <h2>Products</h2>
+      <div class="panel">
+        <input id="pName" placeholder="Product name">
+        <input id="pPrice" placeholder="Price">
+        <button class="btn" id="addProduct">Add</button>
+      </div>
+      <div id="productsList" class="list"></div>
+    </section>
 
-  <h2>المنتجات</h2>
-  <div id="adminProducts" class="products"></div>
+    <!-- ORDERS -->
+    <section class="view hidden" id="orders">
+      <h2>Orders</h2>
+      <div id="ordersList" class="list"></div>
+    </section>
 
-</main>
+    <!-- COUPONS -->
+    <section class="view hidden" id="coupons">
+      <h2>Coupons</h2>
+      <div class="panel">
+        <input id="cCode" placeholder="CODE">
+        <input id="cValue" placeholder="Discount %">
+        <button class="btn" id="addCoupon">Add</button>
+      </div>
+      <div id="couponsList" class="list"></div>
+    </section>
+
+    <!-- USERS -->
+    <section class="view hidden" id="users">
+      <h2>Users</h2>
+      <div id="usersList" class="list"></div>
+    </section>
+  </main>
+</div>
 
 <script src="admin.js"></script>
 </body>
 </html>
-
