@@ -1,81 +1,37 @@
-const ADMIN_KEY = prompt("أدخل كلمة مرور الأدمن:");
+// حماية بسيطة: لازم يكون فيه token
+const token = localStorage.getItem("token");
+if (!token) location.href = "/login.html";
 
-const couponsDiv = document.getElementById("coupons");
+const sideItems = document.querySelectorAll(".side-item");
+const views = document.querySelectorAll(".view");
 
-// ================= Load Coupons =================
-async function loadCoupons() {
-  if (!couponsDiv) return;
+sideItems.forEach(i=>{
+  i.onclick=()=>{
+    sideItems.forEach(x=>x.classList.remove("active"));
+    i.classList.add("active");
+    views.forEach(v=>v.classList.add("hidden"));
+    document.getElementById(i.dataset.view).classList.remove("hidden");
+  };
+});
 
-  const res = await fetch("/api/admin/coupons", {
-    headers: { "x-admin-key": ADMIN_KEY }
-  });
-  const coupons = await res.json();
+document.getElementById("logoutBtn").onclick=()=>{
+  localStorage.removeItem("token");
+  location.href="/";
+};
 
-  couponsDiv.innerHTML = "";
-  coupons.forEach(c => {
-    couponsDiv.innerHTML += `
-      <div class="product">
-        <h3>${c.code}</h3>
-        <p>
-          الخصم:
-          ${c.type === "percent" ? c.value + "%" : c.value + " SAR"}
-        </p>
-        <p>الاستخدام: ${c.used}/${c.maxUses || "∞"}</p>
-        <p>الحالة: ${c.active ? "✅ فعال" : "❌ معطل"}</p>
-        <button onclick="toggleCoupon('${c._id}')">
-          ${c.active ? "تعطيل" : "تفعيل"}
-        </button>
-        <button onclick="deleteCoupon('${c._id}')">
-          حذف
-        </button>
-      </div>
-    `;
-  });
-}
+// بيانات وهمية مؤقتًا (إلى ما نربط API)
+document.getElementById("statUsers").textContent="—";
+document.getElementById("statOrders").textContent="—";
+document.getElementById("statRevenue").textContent="—";
 
-// ================= Create Coupon =================
-const couponForm = document.getElementById("couponForm");
-if (couponForm) {
-  couponForm.addEventListener("submit", async e => {
-    e.preventDefault();
-
-    await fetch("/api/admin/coupons", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-admin-key": ADMIN_KEY
-      },
-      body: JSON.stringify({
-        code: code.value,
-        type: type.value,
-        value: value.value,
-        maxUses: maxUses.value || null,
-        expiresAt: expiresAt.value || null
-      })
-    });
-
-    couponForm.reset();
-    loadCoupons();
-  });
-}
-
-// ================= Actions =================
-async function toggleCoupon(id) {
-  await fetch(`/api/admin/coupons/${id}/toggle`, {
-    method: "POST",
-    headers: { "x-admin-key": ADMIN_KEY }
-  });
-  loadCoupons();
-}
-
-async function deleteCoupon(id) {
-  if (!confirm("متأكد من حذف الكوبون؟")) return;
-
-  await fetch(`/api/admin/coupons/${id}`, {
-    method: "DELETE",
-    headers: { "x-admin-key": ADMIN_KEY }
-  });
-  loadCoupons();
-}
-
-loadCoupons();
+// أمثلة إضافة عناصر (واجهة فقط الآن)
+const productsList = document.getElementById("productsList");
+document.getElementById("addProduct").onclick=()=>{
+  const n=document.getElementById("pName").value;
+  const p=document.getElementById("pPrice").value;
+  if(!n||!p) return;
+  const row=document.createElement("div");
+  row.className="row";
+  row.innerHTML=`<span>${n}</span><span>${p}</span>`;
+  productsList.appendChild(row);
+};
