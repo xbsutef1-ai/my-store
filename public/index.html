@@ -1,20 +1,260 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>GLOM Store</title>
-  <link rel="stylesheet" href="theme.css">
+
+  <!-- Theme -->
+  <link rel="stylesheet" href="theme.css" />
+
+  <!-- Optional: fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;600;700;800&display=swap" rel="stylesheet">
 </head>
+
 <body>
+  <!-- Animated background canvas (optional, store.js can draw on it) -->
+  <canvas id="bg"></canvas>
 
-<header class="header">
-  <h1>GLOM <span>Store</span></h1>
-</header>
+  <!-- Top Bar -->
+  <header class="topbar">
+    <!-- Left: Burger -->
+    <button id="menuBtn" class="icon-btn" aria-label="Menu">
+      <span class="burger">
+        <i></i><i></i><i></i>
+      </span>
+    </button>
 
-<main>
-  <div id="products" class="products"></div>
-</main>
+    <!-- Center: Brand -->
+    <div class="brand">
+      <div class="brand-title">GLOM <span>Store</span></div>
+      <div class="brand-sub">متجر رقمي — ثيم بنفسجي/أسود ✨</div>
+    </div>
 
-<script src="store.js"></script>
+    <!-- Right: Account -->
+    <div class="topbar-right">
+      <button id="accountBtn" class="account-btn" aria-label="Account">
+        <span class="avatar"></span>
+        <span class="account-label">حسابي</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Sidebar -->
+  <aside id="sideMenu" class="side-menu">
+    <div class="side-head">
+      <div class="side-title">القوائم</div>
+      <button id="closeMenuBtn" class="icon-btn sm" aria-label="Close">
+        ✕
+      </button>
+    </div>
+
+    <div class="side-section">
+      <div class="side-item active" data-category="">
+        <span class="dot"></span>
+        <span>كل المنتجات</span>
+      </div>
+
+      <!-- categories injected here -->
+      <div id="catMenu"></div>
+    </div>
+
+    <div class="side-footer">
+      <a class="side-discord" id="discordLink" href="#" target="_blank" rel="noopener">
+        <span class="dc-icon"></span>
+        <span>Support</span>
+      </a>
+      <div class="side-note">إذا ما اخترت قائمة: تظهر كل المنتجات.</div>
+    </div>
+  </aside>
+
+  <!-- Backdrop -->
+  <div id="backdrop" class="backdrop hidden"></div>
+
+  <!-- Account Dropdown -->
+  <div id="accountMenu" class="account-menu hidden">
+    <button class="am-item" id="goLogin">تسجيل دخول</button>
+    <button class="am-item" id="goRegister">إنشاء حساب</button>
+    <div class="am-sep"></div>
+    <button class="am-item" id="goMyOrders">طلباتي</button>
+    <button class="am-item danger hidden" id="logoutBtn">تسجيل خروج</button>
+  </div>
+
+  <!-- Main -->
+  <main class="main">
+    <!-- Filters Row -->
+    <section class="toolbar">
+      <div class="toolbar-left">
+        <div class="pill" id="activeCategoryPill">كل المنتجات</div>
+        <div class="pill subtle" id="productsCountPill">0 منتجات</div>
+      </div>
+
+      <div class="toolbar-right">
+        <div class="search">
+          <input id="searchInput" type="search" placeholder="ابحث عن منتج…" autocomplete="off" />
+          <span class="search-ico">⌕</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Products Grid -->
+    <section class="grid-wrap">
+      <div id="products" class="products"></div>
+
+      <!-- Empty State -->
+      <div id="emptyState" class="empty hidden">
+        <div class="empty-title">ما فيه منتجات هنا</div>
+        <div class="empty-sub">جرّب تختار قائمة ثانية أو احذف البحث.</div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Product Details Modal -->
+  <div id="productModal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-box wide">
+      <div class="modal-head">
+        <div class="mh-title" id="pmTitle">تفاصيل المنتج</div>
+        <button class="icon-btn sm" id="pmClose" aria-label="Close">✕</button>
+      </div>
+
+      <div class="modal-content">
+        <div class="pm-left">
+          <div class="pm-img">
+            <img id="pmImg" src="" alt="Product" />
+            <div class="pm-badge" id="pmBadge">GLOM</div>
+          </div>
+
+          <div class="pm-thumbs" id="pmThumbs">
+            <!-- thumbs injected -->
+          </div>
+        </div>
+
+        <div class="pm-right">
+          <div class="pm-desc" id="pmDesc">...</div>
+
+          <div class="pm-plans">
+            <div class="pm-label">اختر الفترة</div>
+            <div id="pmPlans" class="plans-list">
+              <!-- plans injected -->
+            </div>
+          </div>
+
+          <div class="pm-actions">
+            <div class="price-box">
+              <div class="price-top">السعر</div>
+              <div class="price-val" id="pmPrice">$0</div>
+              <div class="price-sub" id="pmStock">Stock: 0</div>
+            </div>
+
+            <button id="pmBuy" class="btn primary" disabled>
+              اختر فترة للشراء
+            </button>
+          </div>
+
+          <div class="pm-note">
+            بعد التحويل البنكي، ترفع إثبات الدفع ويتم التسليم بعد المراجعة.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Checkout Modal -->
+  <div id="checkoutModal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-box">
+      <div class="modal-head">
+        <div class="mh-title">إتمام الطلب</div>
+        <button class="icon-btn sm" id="coClose" aria-label="Close">✕</button>
+      </div>
+
+      <div class="modal-content">
+        <div class="co-row">
+          <div class="co-label">المنتج</div>
+          <div class="co-val" id="coProduct">—</div>
+        </div>
+
+        <div class="co-row">
+          <div class="co-label">الفترة</div>
+          <div class="co-val" id="coPlan">—</div>
+        </div>
+
+        <div class="co-row">
+          <div class="co-label">السعر</div>
+          <div class="co-val" id="coPrice">$0</div>
+        </div>
+
+        <div class="co-row">
+          <div class="co-label">إيميل العميل</div>
+          <input id="coEmail" class="input" placeholder="example@email.com" />
+        </div>
+
+        <div class="co-row">
+          <div class="co-label">كوبون خصم (اختياري)</div>
+          <div class="co-coupon">
+            <input id="coCoupon" class="input" placeholder="GLOM20" />
+            <button id="applyCouponBtn" class="btn ghost">تطبيق</button>
+          </div>
+          <div class="co-hint" id="couponMsg"></div>
+        </div>
+
+        <div class="co-row total">
+          <div class="co-label">الإجمالي</div>
+          <div class="co-val" id="coFinal">$0</div>
+        </div>
+
+        <div class="co-actions">
+          <button id="createOrderBtn" class="btn primary">إنشاء الطلب</button>
+          <button id="cancelOrderBtn" class="btn">إلغاء</button>
+        </div>
+
+        <div class="co-small">
+          * بعد إنشاء الطلب، سترى رقم الطلب وخطوات رفع إثبات التحويل.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Payment Proof Modal -->
+  <div id="proofModal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-box">
+      <div class="modal-head">
+        <div class="mh-title">رفع إثبات التحويل</div>
+        <button class="icon-btn sm" id="prClose" aria-label="Close">✕</button>
+      </div>
+
+      <div class="modal-content">
+        <div class="co-row">
+          <div class="co-label">رقم الطلب</div>
+          <div class="co-val mono" id="prOrderId">—</div>
+        </div>
+
+        <div class="co-row">
+          <div class="co-label">رقم العملية / المرجع</div>
+          <input id="prRef" class="input" placeholder="مثال: 123456 / TRX..." />
+        </div>
+
+        <div class="co-row">
+          <div class="co-label">رابط صورة الإثبات</div>
+          <input id="prUrl" class="input" placeholder="https://..." />
+          <div class="co-small">ارفع الصورة على أي موقع صور ثم حط الرابط هنا.</div>
+        </div>
+
+        <div class="co-actions">
+          <button id="sendProofBtn" class="btn primary">إرسال الإثبات</button>
+          <button id="prCancel" class="btn">إلغاء</button>
+        </div>
+
+        <div id="proofMsg" class="co-hint"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast hidden"></div>
+
+  <!-- Store JS -->
+  <script src="store.js"></script>
 </body>
 </html>
