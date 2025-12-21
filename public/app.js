@@ -1,33 +1,35 @@
-document.addEventListener("DOMContentLoaded",()=>{
+document.addEventListener("DOMContentLoaded", () => {
+  const accountBtn = document.getElementById("accountBtn");
+  const accountMenu = document.getElementById("accountMenu");
 
-  const accountBtn=document.getElementById("accountBtn");
-  const accountMenu=document.getElementById("accountMenu");
-  const token=localStorage.getItem("token");
+  const loginLink = document.getElementById("loginLink");
+  const registerLink = document.getElementById("registerLink");
+  const verifyLink = document.getElementById("verifyLink");
+  const accountLink = document.getElementById("accountLink");
+  const logoutLink = document.getElementById("logoutLink");
 
-  function updateMenu(){
-    accountMenu.querySelectorAll("a").forEach(a=>a.style.display="none");
-    if(token){
-      accountMenu.querySelector('[href="/account.html"]').style.display="block";
-      accountMenu.querySelector('[href="/invoices.html"]').style.display="block";
-      accountMenu.querySelector('[onclick="logout()"]').style.display="block";
-    }else{
-      accountMenu.querySelector('[href="/login.html"]').style.display="block";
-      accountMenu.querySelector('[href="/register.html"]').style.display="block";
-    }
+  const token = localStorage.getItem("token");
+
+  if (token) {
+    loginLink.style.display = "none";
+    registerLink.style.display = "none";
+  } else {
+    accountLink.style.display = "none";
+    logoutLink.style.display = "none";
   }
 
-  updateMenu();
+  accountBtn.onclick = () => {
+    accountMenu.classList.toggle("hidden");
+  };
 
-  accountBtn.onclick=()=>accountMenu.classList.toggle("hidden");
-  document.addEventListener("click",e=>{
-    if(!accountMenu.contains(e.target)&&!accountBtn.contains(e.target)){
+  document.addEventListener("click", (e) => {
+    if (!accountBtn.contains(e.target) && !accountMenu.contains(e.target)) {
       accountMenu.classList.add("hidden");
     }
   });
 
-  window.logout=()=>{
+  logoutLink.onclick = () => {
     localStorage.removeItem("token");
-    location.reload();
+    location.href = "/";
   };
-
 });
