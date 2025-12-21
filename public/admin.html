@@ -1,78 +1,77 @@
 <!DOCTYPE html>
 <html lang="ar">
 <head>
-  <meta charset="UTF-8" />
-  <title>GLOM Admin</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="theme.css" />
-  <link rel="stylesheet" href="admin.css" />
+  <meta charset="UTF-8">
+  <title>GLOM Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="theme.css">
+  <link rel="stylesheet" href="admin.css">
 </head>
-<body class="admin-body">
+<body>
 
 <header class="admin-top">
-  <div class="brand">GLOM <span>Admin</span></div>
-  <button id="logoutBtn" class="btn danger">Logout</button>
+  <div class="brand">GLOM <span>Dashboard</span></div>
+  <div class="admin-actions">
+    <span id="adminName">Admin</span>
+    <button id="logoutBtn" class="btn danger">Logout</button>
+  </div>
 </header>
 
-<div class="admin-wrap">
-  <aside class="admin-side">
-    <a class="side-item active" data-view="overview">Overview</a>
-    <a class="side-item" data-view="products">Products</a>
-    <a class="side-item" data-view="orders">Orders</a>
-    <a class="side-item" data-view="coupons">Coupons</a>
-    <a class="side-item" data-view="users">Users</a>
+<div class="admin-layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="side-item active">Overview</div>
+    <div class="side-item disabled">Products</div>
+    <div class="side-item disabled">Orders</div>
+    <div class="side-item disabled">Customers</div>
+    <div class="side-item disabled">Coupons</div>
   </aside>
 
+  <!-- MAIN -->
   <main class="admin-main">
-    <!-- OVERVIEW -->
-    <section class="view" id="overview">
-      <h2>Overview</h2>
-      <div class="cards">
-        <div class="card glow">
-          <p>Users</p><h3 id="statUsers">—</h3>
-        </div>
-        <div class="card glow">
-          <p>Orders</p><h3 id="statOrders">—</h3>
-        </div>
-        <div class="card glow">
-          <p>Revenue</p><h3 id="statRevenue">—</h3>
-        </div>
+
+    <!-- STATS -->
+    <section class="stats">
+      <div class="stat-card glow">
+        <p>Total Sales</p>
+        <h2 id="totalSales">—</h2>
+      </div>
+
+      <div class="stat-card glow">
+        <p>Orders</p>
+        <h2 id="totalOrders">—</h2>
+      </div>
+
+      <div class="stat-card glow">
+        <p>Customers</p>
+        <h2 id="totalUsers">—</h2>
+      </div>
+
+      <div class="stat-card glow">
+        <p>Pending</p>
+        <h2 id="pendingOrders">—</h2>
       </div>
     </section>
 
-    <!-- PRODUCTS -->
-    <section class="view hidden" id="products">
-      <h2>Products</h2>
-      <div class="panel">
-        <input id="pName" placeholder="Product name">
-        <input id="pPrice" placeholder="Price">
-        <button class="btn" id="addProduct">Add</button>
+    <!-- CHART PLACEHOLDER -->
+    <section class="chart-box glow">
+      <h3>Sales activity (Last 7 days)</h3>
+      <div class="chart-placeholder">
+        <span>Chart coming next stage</span>
       </div>
-      <div id="productsList" class="list"></div>
     </section>
 
-    <!-- ORDERS -->
-    <section class="view hidden" id="orders">
-      <h2>Orders</h2>
-      <div id="ordersList" class="list"></div>
-    </section>
-
-    <!-- COUPONS -->
-    <section class="view hidden" id="coupons">
-      <h2>Coupons</h2>
-      <div class="panel">
-        <input id="cCode" placeholder="CODE">
-        <input id="cValue" placeholder="Discount %">
-        <button class="btn" id="addCoupon">Add</button>
+    <!-- RECENT ORDERS -->
+    <section class="recent glow">
+      <h3>Recent Orders</h3>
+      <div id="recentOrders" class="list">
+        <div class="skeleton"></div>
+        <div class="skeleton"></div>
+        <div class="skeleton"></div>
       </div>
-      <div id="couponsList" class="list"></div>
     </section>
 
-    <!-- USERS -->
-    <section class="view hidden" id="users">
-      <h2>Users</h2>
-      <div id="usersList" class="list"></div>
-    </section>
   </main>
 </div>
 
