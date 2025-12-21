@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Verify Email</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="theme.css">
 </head>
 <body>
@@ -24,30 +25,40 @@
 </div>
 
 <script>
-const msg = document.getElementById("msg");
+const params = new URLSearchParams(window.location.search);
+const emailParam = params.get("email");
+if (emailParam) {
+  document.getElementById("email").value = emailParam;
+}
 
 verifyBtn.onclick = async () => {
+  const msg = document.getElementById("msg");
   msg.textContent = "";
-  const res = await fetch("/api/verify",{
-    method:"POST",
-    headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify({
+
+  const res = await fetch("/api/verify", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
       email: email.value.trim(),
       code: code.value.trim()
     })
   });
-  const data = await res.json().catch(()=>({}));
+
+  const data = await res.json().catch(() => ({}));
   msg.textContent = res.ok ? "Verified successfully" : data.error;
 };
 
 resendBtn.onclick = async () => {
+  const msg = document.getElementById("msg");
   msg.textContent = "Sending new code...";
-  const res = await fetch("/api/resend-code",{
-    method:"POST",
-    headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify({ email: email.value.trim() })
+
+  const res = await fetch("/api/resend-code", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email: email.value.trim() })
   });
-  const data = await res.json().catch(()=>({}));
+
+  const data = await res.json().catch(() => ({}));
   msg.textContent = res.ok ? "New code sent to your email" : data.error;
 };
 </script>
