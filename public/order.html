@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>حالة الطلب | GLOM Store</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/theme.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand-title">GLOM <span>Store</span></div>
+</header>
+
+<main class="container" style="max-width:700px;margin:auto">
+
+  <h1>حالة الطلب</h1>
+
+  <div class="card" id="orderBox">جاري التحميل...</div>
+
+  <div class="card">
+    <h3>رمز التحويل</h3>
+    <div id="refCode" style="font-size:22px;font-weight:800"></div>
+    <p>اكتب هذا الرمز في وصف/سبب التحويل البنكي</p>
+  </div>
+
+  <div class="card" id="proofBox">
+    <h3>إثبات الدفع</h3>
+    <input type="file" id="proofFile" accept="image/*">
+    <input id="refInput" placeholder="أعد كتابة رمز التحويل للتأكيد">
+    <button class="btn" onclick="uploadProof()">رفع الإثبات</button>
+    <p id="msg"></p>
+  </div>
+
+</main>
+
+<script src="/order.js"></script>
+</body>
+</html>
