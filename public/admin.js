@@ -1,105 +1,78 @@
-const token = localStorage.getItem("token") || "";
+let currentProduct=null;
+let currentPlan=null;
 
-/* ---------- Tabs ---------- */
-document.querySelectorAll(".tab").forEach(btn => {
-  btn.onclick = () => {
-    document.querySelectorAll(".tab").forEach(b => b.classList.remove("active"));
-    document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+async function loadProducts(){
+  const res=await fetch("/api/admin/products");
+  const data=await res.json();
 
-    btn.classList.add("active");
-    document.getElementById(btn.dataset.tab).classList.add("active");
-  };
-});
-
-/* ---------- Overview ---------- */
-async function loadOverview() {
-  const res = await fetch("/api/admin/overview", {
-    headers: { Authorization: "Bearer " + token }
-  });
-  const data = await res.json();
-
-  statOrders.textContent = data.totalOrders;
-  statRevenue.textContent = data.revenue;
-
-  new Chart(document.getElementById("revenueChart"), {
-    type: "bar",
-    data: {
-      labels: ["Revenue"],
-      datasets: [{
-        data: [data.revenue],
-        backgroundColor: "#b66bff"
-      }]
-    }
-  });
-}
-
-/* ---------- Products ---------- */
-async function loadProducts() {
-  const res = await fetch("/api/admin/products", {
-    headers: { Authorization: "Bearer " + token }
-  });
-  const products = await res.json();
-
-  productsList.innerHTML = products.map(p => `
-    <div class="card">
-      <b>${p.title}</b><br>
-      <small>${p.plans.length} plans</small>
-
-      <div class="card-actions">
-        <button onclick="deleteProduct('${p._id}')">Delete</button>
-      </div>
+  productsList.innerHTML=data.map(p=>`
+    <div style="border:1px solid #444;padding:10px;margin:10px">
+      <b>${p.title}</b>
+      ${p.plans.map(pl=>`
+        <div>
+          ${pl.name} ($${pl.price}) – ${pl.keys.length} keys
+          <button onclick="openKeys('${p._id}','${pl.name}')">Keys</button>
+        </div>
+      `).join("")}
+      <button onclick="openPlan('${p._id}')">➕ Add Plan</button>
     </div>
   `).join("");
 }
 
-async function deleteProduct(id) {
-  await fetch(`/api/admin/products/${id}`, {
-    method: "DELETE",
-    headers: { Authorization: "Bearer " + token }
+function openPlan(pid){
+  currentProduct=pid;
+  planModal.classList.remove("hidden");
+}
+async function savePlan(){
+  await fetch(`/api/admin/products/${currentProduct}/plan`,{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({
+      name:planName.value,
+      price:planPrice.value
+    })
   });
+  planModal.classList.add("hidden");
   loadProducts();
 }
 
-/* ---------- Orders ---------- */
-async function loadOrders() {
-  const res = await fetch("/api/admin/orders", {
-    headers: { Authorization: "Bearer " + token }
+function openKeys(pid,plan){
+  currentProduct=pid;
+  currentPlan=plan;
+  keysModal.classList.remove("hidden");
+}
+async function uploadKeys(){
+  const f=document.getElementById("keysFile").files[0];
+  const fd=new FormData();
+  fd.append("file",f);
+
+  await fetch(`/api/admin/products/${currentProduct}/plan/${currentPlan}/upload-keys`,{
+    method:"POST",
+    body:fd
   });
-  const orders = await res.json();
+  keysModal.classList.add("hidden");
+  loadProducts();
+}
 
-  ordersList.innerHTML = orders.map(o => `
-    <div class="card">
-      <b>${o.userEmail}</b><br>
-      ${o.items[0].title} – ${o.items[0].plan}<br>
-      <small>Status: ${o.status}</small><br>
-      <small>Proof: ${o.payment?.flag || "—"}</small>
+async function loadOrders(){
+  const res=await fetch("/api/admin/orders");
+  const data=await res.json();
 
-      <div class="card-actions">
-        ${o.status === "waiting_review"
-          ? `<button onclick="approveOrder('${o._id}')">Approve</button>`
-          : ""}
-        ${o.invoicePath
-          ? `<a href="${o.invoicePath}" target="_blank">Invoice</a>`
-          : ""}
-      </div>
+  ordersList.innerHTML=data.map(o=>`
+    <div style="border:1px solid #333;padding:10px;margin:10px">
+      ${o.userEmail} – ${o.status}
+      (${o.payment?.flag||"-"})
+      ${o.status==="waiting_review"
+        ? `<button onclick="approve('${o._id}')">Approve</button>`
+        : ""}
     </div>
   `).join("");
 }
 
-async function approveOrder(id) {
-  await fetch(`/api/admin/orders/${id}/approve`, {
-    method: "POST",
-    headers: { Authorization: "Bearer " + token }
-  });
+async function approve(id){
+  await fetch(`/api/admin/orders/${id}/approve`,{method:"POST"});
   loadOrders();
 }
 
-/* ---------- Init ---------- */
-loadOverview();
 loadProducts();
 loadOrders();
-
-function logout() {
-  localStorage.removeItem("token");
-  location.reload();
-}
