@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <title>GLOM Dashboard</title>
+  <title>GLOM Admin</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="/admin.css">
 </head>
@@ -13,48 +13,31 @@
   <!-- SIDEBAR -->
   <aside class="sidebar">
     <h2>GLOM</h2>
-    <div class="menu">
-      <button onclick="showTab('overview')">📊 Overview</button>
-      <button onclick="showTab('products')">📦 Products</button>
-      <button onclick="showTab('orders')">🧾 Orders</button>
-    </div>
+    <button onclick="showTab('products')">📦 المنتجات</button>
   </aside>
 
-  <!-- MAIN -->
+  <!-- CONTENT -->
   <main class="content">
 
-    <!-- OVERVIEW -->
-    <section id="overview" class="tab">
-      <h1>Overview</h1>
-      <div class="stats">
-        <div class="card"><span id="statOrders">0</span><small>الطلبات</small></div>
-        <div class="card"><span id="statPending">0</span><small>معلّقة</small></div>
-        <div class="card"><span id="statRevenue">0</span><small>الإيرادات</small></div>
-      </div>
-    </section>
-
     <!-- PRODUCTS -->
-    <section id="products" class="tab hidden">
-      <h1>Products</h1>
+    <section id="products" class="tab">
+      <h1>إدارة المنتجات</h1>
 
-      <div class="add-box">
-        <input id="pTitle" placeholder="اسم المنتج">
-        <input id="pPrice" placeholder="السعر">
-        <textarea id="pDesc" placeholder="الوصف"></textarea>
-        <button onclick="addProduct()">➕ إضافة</button>
-      </div>
+      <!-- ADD PRODUCT -->
+      <form id="productForm" enctype="multipart/form-data">
+        <input name="title" placeholder="اسم المنتج" required>
+        <textarea name="description" placeholder="وصف المنتج"></textarea>
+        <input name="category" placeholder="التصنيف (slug)">
+        <input type="file" name="images" multiple accept="image/*" required>
+        <button type="submit">➕ إضافة منتج</button>
+      </form>
+
+      <hr>
 
       <div id="productsList"></div>
     </section>
 
-    <!-- ORDERS -->
-    <section id="orders" class="tab hidden">
-      <h1>Orders</h1>
-      <div id="ordersList"></div>
-    </section>
-
   </main>
-
 </div>
 
 <script src="/admin.js"></script>
