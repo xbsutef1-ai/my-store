@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>طلباتي</title>
+  <link rel="stylesheet" href="theme.css">
+</head>
+<body>
+
+<h2 style="padding:20px">📦 طلباتي</h2>
+<input id="email" placeholder="اكتب إيميلك" style="margin:20px">
+<button onclick="load()">عرض</button>
+
+<div id="orders" style="padding:20px"></div>
+
+<script>
+async function load() {
+  const email = document.getElementById("email").value;
+  const res = await fetch(`/api/store/my-orders?email=${email}`);
+  const data = await res.json();
+
+  orders.innerHTML = data.map(o => `
+    <div class="product-card show" style="margin-bottom:15px">
+      <div class="product-info">
+        <h3>${o.items[0].title}</h3>
+        <div>الفترة: ${o.items[0].plan}</div>
+        <div>الحالة: ${o.status}</div>
+        ${o.delivery ? `<b>المفتاح:</b> ${o.delivery}` : ""}
+      </div>
+    </div>
+  `).join("");
+}
+</script>
+
+</body>
+</html>
