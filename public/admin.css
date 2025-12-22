@@ -11,45 +11,29 @@ body{margin:0;background:#0b0014;color:#eee}
   border-left:1px solid #3b1a6a
 }
 .sidebar h2{color:#b66bff;margin-bottom:20px}
-.menu button{
+.sidebar button{
   width:100%;
-  margin-bottom:10px;
   padding:12px;
   background:#160024;
   border:1px solid #3b1a6a;
   color:#fff;
-  cursor:pointer;
   border-radius:8px;
+  cursor:pointer
 }
-.menu button:hover{background:#1e0033}
 
 /* CONTENT */
 .content{flex:1;padding:30px}
 h1{margin-top:0}
 
-/* STATS */
-.stats{display:flex;gap:20px}
-.card{
-  background:#160024;
-  padding:20px;
-  border-radius:12px;
-  border:1px solid #3b1a6a;
-  min-width:120px;
-  text-align:center
-}
-.card span{font-size:26px;color:#b66bff}
-
-/* ADD PRODUCT */
-.add-box{
-  max-width:400px;
+/* FORM */
+form{
+  max-width:420px;
   background:#160024;
   padding:15px;
   border-radius:12px;
   border:1px solid #3b1a6a;
-  margin-bottom:20px
 }
-.add-box input,
-.add-box textarea{
+form input, form textarea{
   width:100%;
   margin-bottom:10px;
   padding:10px;
@@ -58,7 +42,7 @@ h1{margin-top:0}
   color:#fff;
   border-radius:6px
 }
-.add-box button{
+form button{
   width:100%;
   padding:10px;
   background:#b66bff;
@@ -68,13 +52,18 @@ h1{margin-top:0}
   cursor:pointer
 }
 
-/* LISTS */
-.item{
+/* PRODUCT ITEM */
+.product{
+  margin-top:15px;
+  padding:12px;
   background:#160024;
   border:1px solid #3b1a6a;
-  border-radius:10px;
-  padding:12px;
-  margin-bottom:10px
+  border-radius:10px
 }
-
-.hidden{display:none}
+.product img{
+  width:80px;
+  height:60px;
+  object-fit:cover;
+  margin-right:6px;
+  border-radius:6px
+}
