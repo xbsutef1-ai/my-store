@@ -4,74 +4,139 @@
   <meta charset="UTF-8">
   <title>GLOM Store</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-
   <link rel="stylesheet" href="/theme.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
 
-<!-- TOP BAR -->
 <header class="topbar">
-  <div class="brand-title">GLOM <span>Store</span></div>
+  <div class="brand">GLOM <span>Store</span></div>
 
   <div class="top-actions">
     <div id="userBox"></div>
-    <button class="icon-btn burger" onclick="toggleMenu()">
+    <button class="burger icon-btn" onclick="toggleMenu()">
       <i></i><i></i><i></i>
     </button>
   </div>
 </header>
 
-<!-- SIDE MENU -->
-<aside id="sideMenu" class="side-menu">
-  <h3>القوائم</h3>
-  <div id="categories"></div>
+<aside id="sideMenu" class="sideMenu">
+  <div class="sideHead">
+    <div class="sideTitle">القوائم</div>
+    <button class="icon-btn" onclick="toggleMenu()"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+  <div id="categories" class="cats"></div>
 </aside>
 
-<!-- MAIN -->
 <main class="main">
-  <section class="products" id="products"></section>
+  <div class="hint">إذا ما اخترت قائمة ➜ تظهر كل المنتجات</div>
+  <section id="products" class="grid"></section>
 </main>
 
-<!-- ================= AUTH MODAL ================= -->
-<div id="authModal" class="modal hidden">
-  <div class="modal-box auth-box">
-
-    <h2 id="authTitle">تسجيل الدخول</h2>
-
-    <input id="rgName" placeholder="اسم الحساب" class="auth-input hidden">
-    <input id="rgEmail" placeholder="البريد الإلكتروني" class="auth-input">
-    <input id="rgPass" type="password" placeholder="كلمة المرور" class="auth-input">
-
-    <button class="btn" id="authSubmit">دخول</button>
-
-    <div class="auth-switch">
-      <span id="authSwitchText">ما عندك حساب؟</span>
-      <button onclick="switchAuth()">إنشاء حساب</button>
+<!-- Checkout -->
+<div id="checkoutModal" class="modal hidden">
+  <div class="modalBox">
+    <div class="modalHead">
+      <div class="modalTitle">Checkout</div>
+      <button class="icon-btn" onclick="closeModal('checkoutModal')"><i class="fa-solid fa-xmark"></i></button>
     </div>
 
+    <div class="coRow">
+      <div class="coLabel">المنتج</div>
+      <div class="coVal" id="coProduct"></div>
+    </div>
+
+    <div class="coRow">
+      <div class="coLabel">الفترة</div>
+      <select id="coPlan"></select>
+    </div>
+
+    <div class="coRow">
+      <div class="coLabel">المتوفر</div>
+      <div class="coVal" id="coStock"></div>
+    </div>
+
+    <div class="coRow">
+      <div class="coLabel">السعر</div>
+      <div class="coVal" id="coPrice"></div>
+    </div>
+
+    <input id="coCoupon" class="inp" placeholder="كوبون خصم (اختياري)">
+
+    <div class="totals">
+      <div>الخصم: <b id="coDiscount">0</b></div>
+      <div>الإجمالي: <b id="coFinal">0</b></div>
+    </div>
+
+    <button class="btn" onclick="createOrder()">إنشاء طلب</button>
   </div>
 </div>
 
-<!-- ================= VERIFY MODAL ================= -->
-<div id="verifyModal" class="modal hidden">
-  <div class="modal-box auth-box">
-    <h2>تحقق من الإيميل</h2>
-    <p style="opacity:.8;font-size:14px">أدخل رمز التحقق المرسل لبريدك</p>
+<!-- Proof -->
+<div id="proofModal" class="modal hidden">
+  <div class="modalBox">
+    <div class="modalHead">
+      <div class="modalTitle">رفع إثبات التحويل</div>
+      <button class="icon-btn" onclick="closeModal('proofModal')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
 
-    <input id="vfCode" placeholder="رمز التحقق" class="auth-input">
+    <div class="bankBox" id="bankBox"></div>
+
+    <div class="coRow">
+      <div class="coLabel">رقم الطلب</div>
+      <div class="coVal" id="prOrder"></div>
+    </div>
+
+    <input id="prRef" class="inp" placeholder="رقم العملية / المرجع">
+    <input id="prUrl" class="inp" placeholder="رابط صورة الإثبات (Imgur/Discord CDN...)">
+
+    <button class="btn" onclick="sendProof()">إرسال الإثبات</button>
+    <div class="small" id="prMsg"></div>
+  </div>
+</div>
+
+<!-- Auth Modal -->
+<div id="authModal" class="modal hidden">
+  <div class="modalBox authBox">
+    <div class="modalHead">
+      <div class="modalTitle" id="authTitle">تسجيل الدخول</div>
+      <button class="icon-btn" onclick="closeModal('authModal')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <input id="rgName" class="inp hidden" placeholder="اسم الحساب">
+    <input id="rgEmail" class="inp" placeholder="البريد الإلكتروني">
+    <input id="rgPass" class="inp" type="password" placeholder="كلمة المرور">
+
+    <button class="btn" id="authSubmit">دخول</button>
+
+    <div class="switchRow">
+      <span id="authSwitchText">ما عندك حساب؟</span>
+      <button class="linkBtn" onclick="switchAuth()">إنشاء حساب</button>
+    </div>
+  </div>
+</div>
+
+<!-- Verify -->
+<div id="verifyModal" class="modal hidden">
+  <div class="modalBox authBox">
+    <div class="modalHead">
+      <div class="modalTitle">Verify Email</div>
+      <button class="icon-btn" onclick="closeModal('verifyModal')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <div class="small">أدخل رمز التحقق المرسل إلى بريدك</div>
+    <input id="vfCode" class="inp" placeholder="6-digit code">
 
     <button class="btn" onclick="verifyAccount()">تأكيد</button>
+    <button class="btn ghost" onclick="resendCode()">إعادة إرسال الرمز</button>
+    <div class="small" id="vfMsg"></div>
   </div>
 </div>
 
 <script src="/store.js"></script>
-
 <script>
-function toggleMenu(){
-  document.getElementById("sideMenu").classList.toggle("show");
-}
+function toggleMenu(){ document.getElementById("sideMenu").classList.toggle("show"); }
+function closeModal(id){ document.getElementById(id).classList.add("hidden"); }
 </script>
-
 </body>
 </html>
