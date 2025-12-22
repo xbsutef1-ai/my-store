@@ -1,6 +1,7 @@
 const productsEl = document.getElementById("products");
+let selected = {};
 
-/* ================= LOAD PRODUCTS ================= */
+/* ========== LOAD PRODUCTS ========== */
 async function loadProducts() {
   const res = await fetch("/api/store/products");
   const products = await res.json();
@@ -16,101 +17,98 @@ async function loadProducts() {
           const stock = pl.keys.length;
           return `
             <div class="plan ${stock === 0 ? "disabled" : ""}"
-              data-title="${p.title}"
-              data-plan="${pl.name}"
-              data-price="${pl.price}">
+              onclick="selectPlan('${p._id}','${p.title}','${pl.name}',${pl.price})">
               ${pl.name} – $${pl.price}
-              <div style="font-size:12px;opacity:.7">
-                ${stock > 0 ? `🟢 ${stock} متوفر` : `🔴 غير متوفر`}
+              <div class="plan-stock">
+                ${stock > 0 ? `🟢 ${stock}` : `🔴 غير متوفر`}
               </div>
             </div>
           `;
         }).join("")}
 
-        <button class="btn buy-btn" disabled>اختر فترة</button>
+        <button class="btn" onclick="openCheckout()">شراء</button>
       </div>
     </div>
   `).join("");
 
-  setupPlans();
   animateCards();
   enableGlow();
 }
 
-/* ================= PLAN SELECT ================= */
-function setupPlans() {
-  document.querySelectorAll(".product-card").forEach(card => {
-    let selected = null;
-    const btn = card.querySelector(".buy-btn");
-
-    card.querySelectorAll(".plan:not(.disabled)").forEach(plan => {
-      plan.onclick = () => {
-        card.querySelectorAll(".plan").forEach(p => p.classList.remove("active"));
-        plan.classList.add("active");
-        selected = plan;
-        btn.disabled = false;
-      };
-    });
-
-    btn.onclick = () => openCheckout(selected);
-  });
+/* ========== PLAN SELECT ========== */
+function selectPlan(pid, title, plan, price) {
+  selected = { pid, title, plan, price };
 }
 
-/* ================= CHECKOUT ================= */
-function openCheckout(plan) {
-  const email = prompt("اكتب إيميلك:");
-  if (!email) return;
+/* ========== CHECKOUT MODAL ========== */
+function openCheckout() {
+  if (!selected.plan) return alert("اختر فترة أولًا");
+  document.getElementById("checkoutModal").classList.remove("hidden");
 
-  createOrder({
-    email,
-    productTitle: plan.dataset.title,
-    plan: plan.dataset.plan,
-    price: plan.dataset.price
-  });
+  document.getElementById("coProduct").innerText = selected.title;
+  document.getElementById("coPlan").innerText = selected.plan;
+  document.getElementById("coPrice").innerText = `$${selected.price}`;
+  document.getElementById("coFinal").innerText = `$${selected.price}`;
 }
 
-async function createOrder(data) {
+async function createOrder() {
+  const email = document.getElementById("coEmail").value;
+  if (!email) return alert("اكتب الإيميل");
+
   const res = await fetch("/api/store/order", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data)
+    body: JSON.stringify({
+      email,
+      product: {
+        productId: selected.pid,
+        title: selected.title,
+        plan: selected.plan,
+        price: selected.price
+      },
+      price: selected.price
+    })
   });
-  const order = await res.json();
 
-  alert(`تم إنشاء الطلب ✅\nرقم الطلب:\n${order._id}`);
-  openProof(order._id);
+  const data = await res.json();
+  document.getElementById("checkoutModal").classList.add("hidden");
+  openProof(data.orderId);
 }
 
-/* ================= PAYMENT PROOF ================= */
+/* ========== PAYMENT PROOF ========== */
 function openProof(orderId) {
-  const ref = prompt("اكتب رقم العملية / المرجع:");
-  const proofUrl = prompt("حط رابط صورة إثبات التحويل:");
+  document.getElementById("proofModal").classList.remove("hidden");
+  document.getElementById("prOrderId").innerText = orderId;
 
-  if (!ref || !proofUrl) return alert("البيانات ناقصة");
+  document.getElementById("sendProofBtn").onclick = async () => {
+    const ref = document.getElementById("prRef").value;
+    const url = document.getElementById("prUrl").value;
 
-  fetch(`/api/store/order/${orderId}/payment`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ reference: ref, proofUrl })
-  }).then(() => {
-    alert("تم إرسال الإثبات ⏳ سيتم المراجعة");
-  });
+    await fetch(`/api/store/order/${orderId}/payment`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ reference: ref, proofUrl: url })
+    });
+
+    alert("تم إرسال الإثبات");
+    document.getElementById("proofModal").classList.add("hidden");
+  };
 }
 
-/* ================= ANIMATIONS ================= */
+/* ========== ANIMATION ========== */
 function animateCards() {
-  document.querySelectorAll(".product-card").forEach((c, i) => {
-    setTimeout(() => c.classList.add("show"), i * 80);
-  });
+  document.querySelectorAll(".product-card").forEach((c, i) =>
+    setTimeout(() => c.classList.add("show"), i * 80)
+  );
 }
 
 function enableGlow() {
   document.querySelectorAll(".product-card").forEach(card => {
-    card.addEventListener("mousemove", e => {
+    card.onmousemove = e => {
       const r = card.getBoundingClientRect();
-      card.style.setProperty("--x", ((e.clientX - r.left) / r.width) * 100 + "%");
-      card.style.setProperty("--y", ((e.clientY - r.top) / r.height) * 100 + "%");
-    });
+      card.style.setProperty("--x", `${(e.clientX - r.left) / r.width * 100}%`);
+      card.style.setProperty("--y", `${(e.clientY - r.top) / r.height * 100}%`);
+    };
   });
 }
 
