@@ -1,102 +1,96 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>GLOM Store</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- THEME -->
-  <link rel="stylesheet" href="/theme.css">
-
-  <!-- Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="/theme.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
 </head>
 <body>
 
-<!-- ================= TOP BAR ================= -->
 <header class="topbar">
-  <div class="brand-title">
-    GLOM <span>Store</span>
-  </div>
+  <div class="brand-title">GLOM <span>Store</span></div>
 
-  <button class="icon-btn burger" onclick="toggleMenu()">
-    <i></i>
-    <i></i>
-    <i></i>
-  </button>
+  <div class="top-actions">
+    <div id="userBox"></div>
+    <button class="icon-btn burger" onclick="toggleMenu()">
+      <i></i><i></i><i></i>
+    </button>
+  </div>
 </header>
 
-<!-- ================= SIDE MENU ================= -->
-<div id="sideMenu" style="
-  position:fixed;
-  top:0;right:-260px;
-  width:260px;height:100%;
-  background:#0b0014;
-  border-left:1px solid #3b1a6a;
-  transition:.3s;
-  z-index:3000;
-  padding:20px
-">
-  <h3 style="color:#b66bff;margin-bottom:14px">القوائم</h3>
+<!-- SIDE MENU -->
+<aside id="sideMenu" class="side-menu">
+  <h3>القوائم</h3>
   <div id="categories"></div>
-</div>
+</aside>
 
-<!-- ================= MAIN ================= -->
 <main class="main">
-  <div class="products" id="products">
-    <!-- Products injected by JS -->
-  </div>
+  <section class="products" id="products"></section>
 </main>
 
-<!-- ================= CHECKOUT MODAL ================= -->
+<!-- CHECKOUT -->
 <div id="checkoutModal" class="modal hidden">
   <div class="modal-box">
-    <h3 style="margin-bottom:10px">إتمام الطلب</h3>
+    <h3>إتمام الطلب</h3>
 
-    <div style="font-size:14px;opacity:.85">
+    <div class="co-info">
       <div>المنتج: <b id="coProduct"></b></div>
       <div>الفترة: <b id="coPlan"></b></div>
       <div>السعر: <b id="coPrice"></b></div>
       <div>الإجمالي: <b id="coFinal"></b></div>
     </div>
 
-    <input id="coEmail" placeholder="الإيميل" style="margin-top:12px">
-    <input id="coCoupon" placeholder="كود خصم (اختياري)" style="margin-top:8px">
+    <input id="coEmail" placeholder="الإيميل" />
+    <input id="coCoupon" placeholder="كود خصم (اختياري)" />
 
     <button class="btn" onclick="applyCoupon()">تطبيق الخصم</button>
     <button class="btn" onclick="createOrder()">تأكيد الطلب</button>
-    <button class="btn" style="background:#333" onclick="closeCheckout()">إلغاء</button>
+    <button class="btn cancel" onclick="closeCheckout()">إلغاء</button>
   </div>
 </div>
 
-<!-- ================= PAYMENT PROOF MODAL ================= -->
+<!-- PAYMENT PROOF -->
 <div id="proofModal" class="modal hidden">
   <div class="modal-box">
     <h3>إثبات الدفع</h3>
+    <div>رقم الطلب: <b id="prOrderId"></b></div>
 
-    <div style="font-size:14px;margin-bottom:10px">
-      رقم الطلب:
-      <b id="prOrderId"></b>
-    </div>
-
-    <input id="prRef" placeholder="رقم العملية / المرجع">
-    <input id="prUrl" placeholder="رابط صورة الإثبات">
+    <input id="prRef" placeholder="رقم العملية / المرجع" />
+    <input id="prUrl" placeholder="رابط صورة الإثبات" />
 
     <button class="btn" id="sendProofBtn">إرسال</button>
   </div>
 </div>
 
-<!-- ================= SCRIPTS ================= -->
+<!-- LOGIN -->
+<div id="loginModal" class="modal hidden">
+  <div class="modal-box">
+    <h3>تسجيل الدخول</h3>
+    <input id="lgEmail" placeholder="الإيميل" />
+    <input id="lgPass" placeholder="كلمة المرور" type="password" />
+    <button class="btn" onclick="login()">دخول</button>
+    <button class="btn" onclick="register()">إنشاء حساب</button>
+  </div>
+</div>
+
+<!-- VERIFY -->
+<div id="verifyModal" class="modal hidden">
+  <div class="modal-box">
+    <h3>تحقق من الإيميل</h3>
+    <input id="vfCode" placeholder="رمز التحقق" />
+    <button class="btn" onclick="verify()">تحقق</button>
+  </div>
+</div>
+
 <script src="/store.js"></script>
-
 <script>
-/* Side menu */
 function toggleMenu(){
-  const m = document.getElementById("sideMenu");
-  m.style.right = m.style.right === "0px" ? "-260px" : "0px";
+  const m=document.getElementById("sideMenu");
+  m.classList.toggle("show");
 }
-
-/* Close checkout */
 function closeCheckout(){
   document.getElementById("checkoutModal").classList.add("hidden");
 }
