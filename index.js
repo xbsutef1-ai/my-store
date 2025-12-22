@@ -1,130 +1,108 @@
 import express from "express";
 import mongoose from "mongoose";
-import crypto from "crypto";
 import dotenv from "dotenv";
+import multer from "multer";
+import path from "path";
+import fs from "fs";
 
 dotenv.config();
 
 const app = express();
 app.use(express.json());
 app.use(express.static("public"));
+app.use("/uploads", express.static("uploads"));
 
 /* ================= DATABASE ================= */
-mongoose
-  .connect(process.env.MONGO_URI)
+mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("MongoDB connected"))
   .catch(err => {
-    console.error("MongoDB error:", err);
+    console.error(err);
     process.exit(1);
   });
 
-/* ================= MODELS ================= */
-const User = mongoose.model(
-  "User",
-  new mongoose.Schema({
-    email: { type: String, unique: true },
-    password: String,
-    verified: { type: Boolean, default: false },
-    code: String,
-    codeExpires: Date
-  })
-);
-
-function genCode() {
-  return Math.floor(100000 + Math.random() * 900000).toString();
-}
-
-/* ================= BREVO SEND ================= */
-async function sendVerifyEmail(to, code) {
-  const res = await fetch("https://api.brevo.com/v3/smtp/email", {
-    method: "POST",
-    headers: {
-      "accept": "application/json",
-      "api-key": process.env.BREVO_API_KEY,
-      "content-type": "application/json"
-    },
-    body: JSON.stringify({
-      sender: {
-        name: "GLOM Store",
-        email: "yaghipegusp9@outlook.com" // لازم يكون مضاف ومؤكّد في Brevo
-      },
-      to: [{ email: to }],
-      subject: "رمز التحقق - GLOM Store",
-      htmlContent: `
-        <div style="font-family:Arial;background:#0b0014;color:#fff;padding:30px">
-          <h2 style="color:#b66bff">GLOM Store</h2>
-          <p>رمز التحقق الخاص بك:</p>
-          <div style="
-            font-size:32px;
-            letter-spacing:6px;
-            margin:20px 0;
-            font-weight:bold;
-            color:#b66bff
-          ">
-            ${code}
-          </div>
-          <p>الرمز صالح لمدة 10 دقائق.</p>
-        </div>
-      `
-    })
-  });
-
-  if (!res.ok) {
-    const text = await res.text();
-    console.error("BREVO ERROR:", text);
-    throw new Error("EMAIL_FAILED");
+/* ================= STORAGE (IMAGES) ================= */
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    if (!fs.existsSync("uploads")) fs.mkdirSync("uploads");
+    cb(null, "uploads");
+  },
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname);
+    cb(null, Date.now() + "-" + Math.random().toString(36).slice(2) + ext);
   }
-}
+});
+const upload = multer({ storage });
 
-/* ================= AUTH ================= */
-app.post("/api/auth/register", async (req, res) => {
+/* ================= MODELS ================= */
+const Product = mongoose.model("Product", new mongoose.Schema({
+  title: String,
+  description: String,
+  images: [String],          // صور فعلية
+  category: String,
+  active: { type: Boolean, default: true },
+  plans: [
+    {
+      name: String,
+      price: Number,
+      keys: [String]
+    }
+  ],
+  createdAt: { type: Date, default: Date.now }
+}));
+
+/* ================= ADMIN APIs ================= */
+
+/* ➕ إضافة منتج */
+app.post("/api/admin/products", upload.array("images", 5), async (req, res) => {
   try {
-    const { email, password } = req.body;
-    const code = genCode();
+    const images = req.files.map(f => `/uploads/${f.filename}`);
 
-    await User.findOneAndUpdate(
-      { email },
-      {
-        email,
-        password,
-        verified: false,
-        code,
-        codeExpires: Date.now() + 10 * 60 * 1000
-      },
-      { upsert: true }
-    );
+    const product = await Product.create({
+      title: req.body.title,
+      description: req.body.description,
+      category: req.body.category,
+      images,
+      plans: [] // الفترات نضيفها لاحقًا
+    });
 
-    await sendVerifyEmail(email, code);
-    res.json({ success: true });
+    res.json(product);
   } catch (e) {
     console.error(e);
-    res.status(500).json({ error: "EMAIL_SEND_FAILED" });
+    res.status(500).json({ error: "CREATE_PRODUCT_FAILED" });
   }
 });
 
-app.post("/api/auth/verify", async (req, res) => {
-  const { email, code } = req.body;
-  const u = await User.findOne({ email });
+/* 📦 جلب المنتجات (Admin) */
+app.get("/api/admin/products", async (req, res) => {
+  const products = await Product.find().sort({ createdAt: -1 });
+  res.json(products);
+});
 
-  if (!u || u.code !== code || u.codeExpires < Date.now()) {
-    return res.status(400).json({ error: "INVALID_CODE" });
-  }
+/* ✏️ تعديل منتج */
+app.put("/api/admin/products/:id", async (req, res) => {
+  const product = await Product.findByIdAndUpdate(
+    req.params.id,
+    req.body,
+    { new: true }
+  );
+  res.json(product);
+});
 
-  u.verified = true;
-  u.code = null;
-  await u.save();
-
+/* 🗑️ حذف منتج */
+app.delete("/api/admin/products/:id", async (req, res) => {
+  await Product.findByIdAndDelete(req.params.id);
   res.json({ success: true });
 });
 
-app.post("/api/auth/login", async (req, res) => {
-  const { email, password } = req.body;
-  const u = await User.findOne({ email, password });
+/* ================= STORE API ================= */
 
-  if (!u) return res.status(400).json({ error: "WRONG_CREDENTIALS" });
-  if (!u.verified) return res.status(403).json({ error: "NOT_VERIFIED" });
+/* 🛒 جلب المنتجات للمتجر */
+app.get("/api/store/products", async (req, res) => {
+  const q = { active: true };
+  if (req.query.category) q.category = req.query.category;
 
-  res.json({ success: true });
+  const products = await Product.find(q);
+  res.json(products);
 });
 
 /* ================= SERVER ================= */
