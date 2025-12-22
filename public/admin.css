@@ -1,5 +1,16 @@
-body{
-  background:#0b0614;
-  color:#eee;
-  font-family:Segoe UI;
+body {
+  background: #0b0014;
+  color: #fff;
+  font-family: Tajawal, sans-serif;
+  padding: 20px;
+}
+h1,h2 { color: #b66bff; }
+button {
+  padding: 8px 12px;
+  margin-top: 6px;
+  background: #9b4dff;
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  cursor: pointer;
 }
