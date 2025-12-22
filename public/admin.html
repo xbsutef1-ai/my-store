@@ -1,65 +1,40 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar">
 <head>
   <meta charset="UTF-8">
   <title>GLOM Dashboard</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-
   <link rel="stylesheet" href="admin.css">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
-<header class="top">
-  <div class="brand">GLOM <span>Dashboard</span></div>
+<h1>GLOM Dashboard</h1>
 
-  <div class="user">
-    <span id="roleBadge">ADMIN</span>
-    <button onclick="logout()">Logout</button>
+<section>
+  <h2>Products</h2>
+  <div id="productsList"></div>
+</section>
+
+<section>
+  <h2>Orders</h2>
+  <div id="ordersList"></div>
+</section>
+
+<div id="planModal" class="modal hidden">
+  <div class="modal-box">
+    <h3>إضافة فترة</h3>
+    <input id="planName" placeholder="اسم الفترة">
+    <input id="planPrice" placeholder="السعر">
+    <button onclick="savePlan()">حفظ</button>
   </div>
-</header>
+</div>
 
-<nav class="tabs">
-  <button class="tab active" data-tab="overview">Overview</button>
-  <button class="tab" data-tab="products">Products</button>
-  <button class="tab" data-tab="orders">Orders</button>
-</nav>
-
-<main>
-
-  <!-- OVERVIEW -->
-  <section id="overview" class="view active">
-    <div class="stats">
-      <div class="stat">
-        <div class="stat-title">Total Orders</div>
-        <div class="stat-value" id="statOrders">0</div>
-      </div>
-      <div class="stat">
-        <div class="stat-title">Revenue</div>
-        <div class="stat-value">$<span id="statRevenue">0</span></div>
-      </div>
-    </div>
-
-    <canvas id="revenueChart"></canvas>
-  </section>
-
-  <!-- PRODUCTS -->
-  <section id="products" class="view">
-    <div class="section-head">
-      <h2>Products</h2>
-      <button onclick="openAddProduct()">➕ Add Product</button>
-    </div>
-
-    <div id="productsList"></div>
-  </section>
-
-  <!-- ORDERS -->
-  <section id="orders" class="view">
-    <h2>Orders</h2>
-    <div id="ordersList"></div>
-  </section>
-
-</main>
+<div id="keysModal" class="modal hidden">
+  <div class="modal-box">
+    <h3>رفع مفاتيح</h3>
+    <input type="file" id="keysFile">
+    <button onclick="uploadKeys()">رفع</button>
+  </div>
+</div>
 
 <script src="admin.js"></script>
 </body>
