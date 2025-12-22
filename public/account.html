@@ -7,63 +7,18 @@
   <link rel="stylesheet" href="/theme.css">
 </head>
 <body>
-
 <header class="topbar">
-  <div class="brand-title">GLOM <span>Store</span></div>
+  <div class="brand">GLOM <span>Store</span></div>
+  <div class="top-actions">
+    <button class="btn ghost" style="margin:0;padding:10px 14px" onclick="location.href='/'">رجوع</button>
+  </div>
 </header>
 
 <main class="main">
-  <h2 style="margin-bottom:20px">👤 حسابي</h2>
-
-  <div id="userInfo" style="margin-bottom:30px"></div>
-
-  <h3 style="margin-bottom:10px">📦 طلباتي</h3>
+  <h2 style="margin-bottom:12px">طلباتي</h2>
   <div id="orders"></div>
 </main>
 
-<script>
-const email = localStorage.getItem("userEmail");
-if (!email) location.href = "/";
-
-document.getElementById("userInfo").innerHTML = `
-  <div style="display:flex;align-items:center;gap:12px">
-    <div style="
-      width:44px;height:44px;border-radius:50%;
-      background:#b66bff;color:#000;
-      display:flex;align-items:center;justify-content:center;
-      font-size:20px;font-weight:700
-    ">
-      ${email[0].toUpperCase()}
-    </div>
-    <div>
-      <div><b>${email}</b></div>
-      <a href="#" onclick="logout()">تسجيل خروج</a>
-    </div>
-  </div>
-`;
-
-function logout(){
-  localStorage.removeItem("userEmail");
-  location.href="/";
-}
-
-async function loadOrders(){
-  const res = await fetch(`/api/store/my-orders?email=${email}`);
-  const data = await res.json();
-
-  document.getElementById("orders").innerHTML = data.map(o=>`
-    <div class="product-card show" style="margin-bottom:15px">
-      <div class="product-info">
-        <h3>${o.items[0].title}</h3>
-        <div>الفترة: ${o.items[0].plan}</div>
-        <div>الحالة: <b>${o.status}</b></div>
-        ${o.delivery ? `<div><b>المفتاح:</b> ${o.delivery}</div>` : ""}
-      </div>
-    </div>
-  `).join("");
-}
-loadOrders();
-</script>
-
+<script src="/account.js"></script>
 </body>
 </html>
