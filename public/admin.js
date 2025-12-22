@@ -1,58 +1,80 @@
-function showTab(id){
-  document.querySelectorAll(".tab").forEach(t=>t.classList.add("hidden"));
-  document.getElementById(id).classList.remove("hidden");
-}
+const productsList = document.getElementById("productsList");
+const form = document.getElementById("productForm");
 
-/* ================= OVERVIEW ================= */
-async function loadOverview(){
-  const r = await fetch("/api/admin/overview");
-  const d = await r.json();
-  statOrders.textContent = d.orders;
-  statPending.textContent = d.pending;
-  statRevenue.textContent = d.revenue;
-}
+/* ================= ADD PRODUCT ================= */
+form.onsubmit = async (e)=>{
+  e.preventDefault();
+  const fd = new FormData(form);
 
-/* ================= PRODUCTS ================= */
+  const r = await fetch("/api/admin/products",{
+    method:"POST",
+    body:fd
+  });
+
+  if(!r.ok){
+    alert("فشل إضافة المنتج");
+    return;
+  }
+
+  form.reset();
+  loadProducts();
+};
+
+/* ================= LOAD PRODUCTS ================= */
 async function loadProducts(){
   const r = await fetch("/api/admin/products");
-  const list = await r.json();
+  const products = await r.json();
 
-  productsList.innerHTML = list.map(p=>`
-    <div class="item">
-      <b>${p.title}</b> — $${p.price}
+  productsList.innerHTML = products.map(p=>`
+    <div class="product">
+      <b>${p.title}</b>
       <div style="opacity:.7">${p.description||""}</div>
+
+      <div style="margin:6px 0">
+        ${p.images.map(img=>`<img src="${img}">`).join("")}
+      </div>
+
+      <button onclick="openPlans('${p._id}')">⚙️ الفترات + المفاتيح</button>
     </div>
   `).join("");
 }
 
-async function addProduct(){
-  await fetch("/api/admin/products",{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({
-      title:pTitle.value,
-      price:pPrice.value,
-      description:pDesc.value
-    })
-  });
-  pTitle.value=pPrice.value=pDesc.value="";
-  loadProducts();
-}
+/* ================= PLANS & KEYS ================= */
+function openPlans(id){
+  const name = prompt("اسم الفترة (مثال: شهر)");
+  if(!name) return;
 
-/* ================= ORDERS ================= */
-async function loadOrders(){
-  const r = await fetch("/api/admin/orders");
-  const list = await r.json();
+  const price = prompt("السعر");
+  if(!price) return;
 
-  ordersList.innerHTML = list.map(o=>`
-    <div class="item">
-      <b>${o.userEmail}</b> — ${o.status}
-      <div>$${o.finalTotal}</div>
-    </div>
-  `).join("");
+  const fileInput = document.createElement("input");
+  fileInput.type = "file";
+  fileInput.accept = ".txt";
+
+  fileInput.onchange = async ()=>{
+    const file = fileInput.files[0];
+    const text = await file.text();
+    const keys = text.split("\n").map(k=>k.trim()).filter(Boolean);
+
+    await fetch(`/api/admin/products/${id}`,{
+      method:"PUT",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        $push:{
+          plans:{
+            name,
+            price:Number(price),
+            keys
+          }
+        }
+      })
+    });
+
+    loadProducts();
+  };
+
+  fileInput.click();
 }
 
 /* INIT */
-loadOverview();
 loadProducts();
-loadOrders();
