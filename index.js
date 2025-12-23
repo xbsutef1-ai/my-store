@@ -1,61 +1,63 @@
 import express from "express";
 import mongoose from "mongoose";
 import multer from "multer";
+import path from "path";
+import fs from "fs";
+
+import Product from "./models/Product.js";
+import Category from "./models/Category.js";
 
 const app = express();
 app.use(express.json());
 app.use(express.static("public"));
 app.use("/uploads", express.static("uploads"));
 
-await mongoose.connect(process.env.MONGO_URI);
+mongoose.connect(process.env.MONGO_URI || "mongodb://127.0.0.1/glom-store")
+  .then(()=>console.log("MongoDB connected"));
 
 /* ===== Upload ===== */
+if (!fs.existsSync("uploads/products")) {
+  fs.mkdirSync("uploads/products", { recursive: true });
+}
+
 const storage = multer.diskStorage({
-  destination:"uploads/proofs",
-  filename:(req,file,cb)=>{
-    cb(null,Date.now()+"-"+file.originalname);
-  }
+  destination: "uploads/products",
+  filename: (_, file, cb) =>
+    cb(null, Date.now() + path.extname(file.originalname))
 });
 const upload = multer({ storage });
 
-/* ===== Models ===== */
-const Product = mongoose.model("Product", new mongoose.Schema({
-  title:String,
-  description:String,
-  images:[String],
-  categorySlug:String
-}));
+/* ===== STORE APIs ===== */
+app.get("/api/categories", async (_, res) => {
+  res.json(await Category.find());
+});
 
-const Order = mongoose.model("Order", new mongoose.Schema({
-  productId:String,
-  reference:String,
-  proof:String,
-  status:{ type:String, default:"waiting_discord" }
-}));
-
-/* ===== Store ===== */
-app.get("/api/store/products", async(req,res)=>{
+app.get("/api/products", async (_, res) => {
   res.json(await Product.find());
 });
 
-app.post("/api/store/order", async(req,res)=>{
-  const o = await Order.create({ productId:req.body.productId });
-  res.json({ orderId:o._id });
+/* ===== ADMIN APIs ===== */
+app.post("/api/admin/category", async (req, res) => {
+  const name = req.body.name;
+  const slug = name.toLowerCase().replace(/\s+/g, "-");
+  const cat = await Category.create({ name, slug });
+  res.json(cat);
 });
 
-app.post("/api/store/order/:id/proof",
-  upload.single("proof"),
-  async(req,res)=>{
-    const o = await Order.findById(req.params.id);
-    o.reference = req.body.reference;
-    o.proof = "/uploads/proofs/"+req.file.filename;
-    o.status = "waiting_discord";
-    await o.save();
+app.post("/api/admin/product", upload.single("image"), async (req, res) => {
+  const product = await Product.create({
+    title: req.body.title,
+    description: req.body.description,
+    category: req.body.category,
+    image: "/uploads/products/" + req.file.filename
+  });
+  res.json(product);
+});
 
-    res.json({ ok:true });
-  }
-);
+app.get("/api/admin/products", async (_, res) => {
+  res.json(await Product.find());
+});
 
-/* ===== Start ===== */
+/* ===== START ===== */
 const PORT = process.env.PORT || 3000;
-app.listen(PORT,()=>console.log("Server running",PORT));
+app.listen(PORT, () => console.log("Running on", PORT));
