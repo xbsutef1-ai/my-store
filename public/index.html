@@ -4,16 +4,13 @@
   <meta charset="UTF-8">
   <title>GLOM Store</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-
   <link rel="stylesheet" href="/theme.css">
-  <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
 
 <header class="topbar">
   <div class="brand">GLOM <span>Store</span></div>
-
   <div class="top-actions">
     <div id="userBox"></div>
     <button class="burger icon-btn" onclick="toggleMenu()">
@@ -25,54 +22,58 @@
 <aside id="sideMenu" class="sideMenu">
   <div class="sideHead">
     <div class="sideTitle">القوائم</div>
-    <button class="icon-btn" onclick="toggleMenu()">
-      <i class="fa-solid fa-xmark"></i>
-    </button>
+    <button class="icon-btn" onclick="toggleMenu()"><i class="fa-solid fa-xmark"></i></button>
   </div>
   <div id="categories" class="cats"></div>
 </aside>
 
 <main class="main">
-  <input id="searchInput" class="searchInp" placeholder="🔍 ابحث عن منتج...">
+  <div class="hint">إذا ما اخترت قائمة ➜ تظهر كل المنتجات</div>
   <section id="products" class="grid"></section>
 </main>
 
-<!-- Proof Upload -->
-<div id="proofModal" class="modal hidden">
+<!-- Checkout -->
+<div id="checkoutModal" class="modal hidden">
   <div class="modalBox">
     <div class="modalHead">
-      <div class="modalTitle">رفع إثبات الدفع</div>
-      <button class="icon-btn" onclick="closeModal('proofModal')">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
+      <div class="modalTitle">Checkout</div>
+      <button class="icon-btn" onclick="closeModal('checkoutModal')"><i class="fa-solid fa-xmark"></i></button>
     </div>
+    <div class="coRow"><div class="coLabel">المنتج</div><div class="coVal" id="coProduct"></div></div>
+    <div class="coRow"><div class="coLabel">الفترة</div><select id="coPlan"></select></div>
+    <div class="coRow"><div class="coLabel">المتوفر</div><div class="coVal" id="coStock"></div></div>
+    <div class="coRow"><div class="coLabel">السعر</div><div class="coVal" id="coPrice"></div></div>
+    <input id="coCoupon" class="inp" placeholder="كوبون خصم (اختياري)">
+    <div class="totals">
+      <div>الخصم: <b id="coDiscount">0</b></div>
+      <div>الإجمالي: <b id="coFinal">0</b></div>
+    </div>
+    <button class="btn" onclick="createOrder()">إنشاء طلب</button>
+  </div>
+</div>
 
+<!-- Auth -->
+<div id="authModal" class="modal hidden">
+  <div class="modalBox">
+    <div class="modalHead">
+      <div class="modalTitle" id="authTitle">تسجيل الدخول</div>
+      <button class="icon-btn" onclick="closeModal('authModal')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <input id="rgName" class="inp hidden" placeholder="اسم الحساب">
+    <input id="rgEmail" class="inp" placeholder="البريد الإلكتروني">
+    <input id="rgPass" class="inp" type="password" placeholder="كلمة المرور">
+    <button class="btn" id="authSubmit">دخول</button>
     <div class="small">
-      سيتم إرسال الإثبات للإدارة للمراجعة
+      <span id="authSwitchText">ما عندك حساب؟</span>
+      <button class="btn ghost" onclick="switchAuth()">إنشاء حساب</button>
     </div>
-
-    <div class="coRow">
-      <div class="coLabel">رقم الطلب</div>
-      <div class="coVal" id="prOrder"></div>
-    </div>
-
-    <input id="prRef" class="inp" placeholder="رقم العملية / المرجع">
-    <input id="prFile" type="file" class="inp" accept="image/*">
-
-    <button class="btn" onclick="sendProof()">إرسال الإثبات</button>
-    <div class="small" id="prMsg"></div>
   </div>
 </div>
 
 <script src="/store.js"></script>
 <script>
-function toggleMenu(){
-  document.getElementById("sideMenu").classList.toggle("show");
-}
-function closeModal(id){
-  document.getElementById(id).classList.add("hidden");
-}
+function toggleMenu(){document.getElementById("sideMenu").classList.toggle("show")}
+function closeModal(id){document.getElementById(id).classList.add("hidden")}
 </script>
-
 </body>
 </html>
