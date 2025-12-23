@@ -8,17 +8,20 @@
 <body>
 
 <header>
+  <div class="brand">GLOM <span>Store</span></div>
   <div id="userBox"></div>
 </header>
 
 <!-- Auth Modal -->
 <div id="authModal" class="hidden">
-  <h3 id="authTitle">Login</h3>
-  <input id="rgName" class="hidden" placeholder="Name">
-  <input id="rgEmail" placeholder="Email">
-  <input id="rgPass" type="password" placeholder="Password">
-  <button id="authSubmit" onclick="submitAuth()">Login</button>
-  <button onclick="switchAuth()">Switch</button>
+  <div>
+    <h3 id="authTitle">Login</h3>
+    <input id="rgName" class="hidden" placeholder="Name">
+    <input id="rgEmail" placeholder="Email">
+    <input id="rgPass" type="password" placeholder="Password">
+    <button id="authSubmit" onclick="submitAuth()">Login</button>
+    <button class="ghost" onclick="switchAuth()">Switch</button>
+  </div>
 </div>
 
 <script src="/store.js"></script>
