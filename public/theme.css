@@ -1,117 +1,191 @@
-body{
-  background:#0b0014;
-  color:#fff;
-  font-family:Tahoma, Arial;
-  margin:0;
+/* ===================== GLOM THEME ===================== */
+:root{
+  --bg:#0b0014;
+  --panel:#140022;
+  --panel2:#160026;
+  --border:#3b1a6a;
+  --accent:#9b59ff;
+  --accent2:#b47cff;
+  --text:#fff;
 }
 
-/* ================= TOP BAR ================= */
-.topbar{
-  padding:18px 30px;
-  background:#12001f;
-  border-bottom:1px solid #3b1a6a;
+/* ===== Base ===== */
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:Tahoma, Arial;
 }
-.brand-title{
+
+/* ===== Topbar ===== */
+.topbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:16px 24px;
+  background:#12001f;
+  border-bottom:1px solid var(--border);
+}
+.brand{
   font-size:22px;
   font-weight:bold;
 }
-.brand-title span{
-  color:#b66bff;
-}
+.brand span{color:var(--accent)}
 
-/* ================= LAYOUT ================= */
-.container{
-  padding:30px;
-  max-width:1200px;
-  margin:auto;
-}
-
-/* ================= SEARCH ================= */
-.search-input{
-  width:100%;
-  padding:14px;
-  border-radius:10px;
+/* ===== Buttons ===== */
+.btn{
+  background:var(--accent);
   border:none;
-  background:#160026;
+  padding:10px 18px;
+  border-radius:10px;
   color:#fff;
-  margin-bottom:18px;
-}
-
-/* ================= CATEGORIES ================= */
-.categories{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  margin-bottom:20px;
-}
-.cat{
-  padding:8px 14px;
-  border-radius:20px;
-  border:1px solid #3b1a6a;
   cursor:pointer;
-  font-size:14px;
 }
-.cat.active{
-  background:#9b59ff;
-  border-color:#9b59ff;
+.btn:hover{background:var(--accent2)}
+.btn.ghost{
+  background:transparent;
+  border:1px solid var(--border);
 }
 
-/* ================= PRODUCTS GRID ================= */
-.products{
+/* ===== Layout ===== */
+.main{padding:24px}
+.grid{
   display:grid;
   grid-template-columns:repeat(auto-fill,minmax(240px,1fr));
   gap:22px;
 }
 
-/* ================= PRODUCT CARD ================= */
-.product-card{
-  background:#140022;
-  border:1px solid #3b1a6a;
-  border-radius:14px;
-  padding:15px;
+/* ===== Cards ===== */
+.card{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:16px;
+  overflow:hidden;
+  cursor:pointer;
   opacity:0;
   transform:translateY(20px);
 }
-.product-card img{
+.card.show{
+  opacity:1;
+  transform:translateY(0);
+  transition:.5s;
+}
+.card img{
   width:100%;
-  border-radius:10px;
+  height:160px;
+  object-fit:cover;
+}
+.card .pad{padding:14px}
+.card .title{font-weight:bold;margin-bottom:6px}
+.card .desc{font-size:14px;opacity:.85}
+.card:hover{
+  box-shadow:0 0 25px rgba(155,89,255,.45);
 }
 
-/* ================= BUTTON ================= */
-.btn{
-  background:#9b59ff;
-  border:none;
-  padding:10px 16px;
-  border-radius:10px;
-  color:#fff;
-  cursor:pointer;
-  margin-top:10px;
-}
-.btn:hover{
-  background:#b47cff;
+/* ===== Pills ===== */
+.pill{
+  display:inline-block;
+  background:#220033;
+  border:1px solid var(--border);
+  padding:4px 10px;
+  border-radius:20px;
+  font-size:12px;
+  margin:4px 4px 0 0;
 }
 
-/* ================= ANIMATION ================= */
-.product-card.animate{
-  animation:fadeUp .6s ease forwards;
-}
-@keyframes fadeUp{
-  to{
-    opacity:1;
-    transform:translateY(0);
-  }
-}
-
-/* ================= DISCORD SUPPORT ================= */
-.discord-btn{
+/* ===== Side Menu ===== */
+.sideMenu{
   position:fixed;
-  bottom:20px;
-  right:20px;
-  background:#5865F2;
-  padding:14px 22px;
-  border-radius:30px;
+  top:0;right:-280px;
+  width:280px;height:100%;
+  background:var(--panel2);
+  border-left:1px solid var(--border);
+  transition:.3s;
+  z-index:1000;
+}
+.sideMenu.show{right:0}
+.sideHead{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:14px;
+  border-bottom:1px solid var(--border);
+}
+.cats{padding:12px}
+.catBtn{
+  width:100%;
+  text-align:right;
+  padding:10px;
+  margin-bottom:8px;
+  background:transparent;
+  border:1px solid var(--border);
   color:#fff;
-  text-decoration:none;
-  font-weight:bold;
-  box-shadow:0 0 20px rgba(88,101,242,.6);
+  border-radius:8px;
+}
+.catBtn.active,
+.catBtn:hover{
+  background:var(--accent);
+}
+
+/* ===== Modals ===== */
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.75);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  z-index:2000;
+}
+.modal.hidden{display:none}
+.modalBox{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:14px;
+  width:92%;
+  max-width:420px;
+  padding:18px;
+}
+.modalHead{
+  display:flex;
+  justify-content:space-between;
+  margin-bottom:12px;
+}
+
+/* ===== Inputs ===== */
+.inp, select{
+  width:100%;
+  padding:10px;
+  margin-bottom:10px;
+  background:#0f001a;
+  border:1px solid var(--border);
+  border-radius:8px;
+  color:#fff;
+}
+
+/* ===== Product Page ===== */
+.productPage{
+  max-width:1000px;
+  margin:auto;
+  padding:24px;
+}
+.gallery{
+  display:flex;
+  gap:12px;
+  overflow-x:auto;
+}
+.gallery img{
+  width:260px;
+  border-radius:12px;
+}
+.planRow{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  background:var(--panel2);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:10px;
+  margin-top:10px;
 }
