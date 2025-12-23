@@ -1,98 +1,116 @@
-/* ===================== GLOM STORE - FRONT ===================== */
+const productsEl=document.getElementById("products");
+const categoriesEl=document.getElementById("categories");
+const userBox=document.getElementById("userBox");
 
-const productsEl = document.getElementById("products");
-const categoriesEl = document.getElementById("categories");
-const searchInput = document.getElementById("searchInput");
+let currentCategory="all";
+let productsCache=[];
+let selectedProduct=null;
+let selectedPlan=null;
 
-let currentCategory = "all";
-let productsCache = [];
-let currentOrderId = null;
+/* helpers */
+const $=id=>document.getElementById(id);
+const open=id=>$(id).classList.remove("hidden");
+const close=id=>$(id).classList.add("hidden");
 
-/* ===== Helpers ===== */
-const $ = (id) => document.getElementById(id);
-function safeImg(u){
-  return u || "https://images.unsplash.com/photo-1555949963-ff9fe0c870eb";
+/* user */
+function getUser(){
+  const token=localStorage.getItem("token");
+  const email=localStorage.getItem("email");
+  const name=localStorage.getItem("name");
+  return token&&email?{token,email,name}:null;
 }
+function setUser(u){
+  localStorage.setItem("token",u.token);
+  localStorage.setItem("email",u.email);
+  localStorage.setItem("name",u.name||"");
+}
+function logout(){
+  localStorage.clear();renderUser();
+}
+function renderUser(){
+  const u=getUser();
+  if(!u){
+    userBox.innerHTML=`<button class="btn ghost" onclick="openAuth()">Login</button>`;
+    return;
+  }
+  const letter=(u.name||u.email)[0].toUpperCase();
+  userBox.innerHTML=`
+    <div style="position:relative">
+      <div class="avatar" onclick="toggleUserMenu()">${letter}</div>
+      <div id="userMenu" class="userMenu hidden">
+        <div class="itm" onclick="location.href='/account'">حسابي</div>
+        <div class="itm" onclick="logout()">خروج</div>
+      </div>
+    </div>`;
+}
+window.toggleUserMenu=()=>{const m=$("userMenu");m&&m.classList.toggle("hidden")};
+renderUser();
 
-/* ===== Categories ===== */
+/* categories */
 async function loadCategories(){
-  const r = await fetch("/api/store/categories");
-  const cats = await r.json();
-
-  categoriesEl.innerHTML = `
-    <button class="catBtn ${currentCategory==="all"?"active":""}"
-      onclick="pickCat('all')">الكل</button>
-    ${cats.map(c=>`
-      <button class="catBtn ${currentCategory===c.slug?"active":""}"
-        onclick="pickCat('${c.slug}')">${c.name}</button>
-    `).join("")}
-  `;
+  const r=await fetch("/api/store/categories");
+  const cats=await r.json();
+  categoriesEl.innerHTML=
+    `<button class="catBtn ${currentCategory==='all'?'active':''}" onclick="pickCat('all')">الكل</button>`+
+    cats.map(c=>`<button class="catBtn ${currentCategory===c.slug?'active':''}" onclick="pickCat('${c.slug}')">${c.name}</button>`).join("");
 }
-window.pickCat = (c)=>{ currentCategory=c; render(); };
+window.pickCat=async slug=>{currentCategory=slug;await loadCategories();await loadProducts()};
 
-/* ===== Products ===== */
+/* products */
 async function loadProducts(){
-  const r = await fetch("/api/store/products");
-  productsCache = await r.json();
-  render();
+  const r=await fetch(`/api/store/products?category=${encodeURIComponent(currentCategory)}`);
+  productsCache=await r.json(); renderProducts(productsCache);
 }
-
-function render(){
-  const q = searchInput.value.toLowerCase();
-  const list = productsCache.filter(p=>{
-    const cOk = currentCategory==="all" || p.categorySlug===currentCategory;
-    const sOk = p.title.toLowerCase().includes(q);
-    return cOk && sOk;
-  });
-
-  productsEl.innerHTML = list.map((p,i)=>`
-    <article class="card show" style="animation-delay:${i*60}ms"
-      onclick="createOrder('${p._id}')">
-      <img src="${safeImg(p.images?.[0])}">
+function renderProducts(list){
+  productsEl.innerHTML=list.map(p=>{
+    const img=(p.images&&p.images[0])||"https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?q=80&w=1200&auto=format&fit=crop";
+    return `
+    <article class="card">
+      <img src="${img}">
       <div class="pad">
         <div class="title">${p.title}</div>
         <div class="desc">${p.description||""}</div>
+        <button class="btn" onclick="openCheckout('${p._id}')">شراء</button>
       </div>
-    </article>
-  `).join("");
-}
+    </article>`;
+  }).join("");
 
-searchInput.oninput = render;
-
-/* ===== Order ===== */
-async function createOrder(pid){
-  const r = await fetch("/api/store/order",{
-    method:"POST",
-    headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify({ productId: pid })
-  });
-  const d = await r.json();
-
-  currentOrderId = d.orderId;
-  $("prOrder").textContent = currentOrderId;
-  $("proofModal").classList.remove("hidden");
-}
-
-/* ===== Proof Upload ===== */
-window.sendProof = async ()=>{
-  const ref = $("prRef").value.trim();
-  const file = $("prFile").files[0];
-  if(!ref || !file) return alert("اكتب المرجع وارفع الصورة");
-
-  const fd = new FormData();
-  fd.append("reference", ref);
-  fd.append("proof", file);
-
-  const r = await fetch(`/api/store/order/${currentOrderId}/proof`,{
-    method:"POST",
-    body:fd
+  document.querySelectorAll(".card").forEach(card=>{
+    card.addEventListener("mousemove",e=>{
+      const r=card.getBoundingClientRect();
+      card.style.setProperty("--mx",((e.clientX-r.left)/r.width*100)+"%");
+      card.style.setProperty("--my",((e.clientY-r.top)/r.height*100)+"%");
+    });
   });
 
-  if(!r.ok) return alert("فشل الإرسال");
-  $("prMsg").textContent = "✅ تم إرسال الإثبات للإدارة";
+  const obs=new IntersectionObserver(es=>es.forEach(e=>e.isIntersecting&&e.target.classList.add("show")),{threshold:.1});
+  document.querySelectorAll(".card").forEach(c=>obs.observe(c));
+}
+
+/* auth */
+let authMode="login";
+window.openAuth=()=>{authMode="login";updateAuthUI();open("authModal")};
+window.switchAuth=()=>{authMode=authMode==="login"?"register":"login";updateAuthUI()};
+function updateAuthUI(){
+  $("authTitle").textContent=authMode==="login"?"تسجيل الدخول":"إنشاء حساب";
+  $("authSubmit").textContent=authMode==="login"?"دخول":"تسجيل";
+  $("authSwitchText").textContent=authMode==="login"?"ما عندك حساب؟":"عندك حساب؟";
+  $("rgName").classList.toggle("hidden",authMode!=="register");
+}
+$("authSubmit").onclick=async()=>{
+  const email=$("rgEmail").value.trim().toLowerCase();
+  const pass=$("rgPass").value.trim();
+  const name=$("rgName").value.trim();
+  if(authMode==="login"){
+    const r=await fetch("/api/auth/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email,password:pass})});
+    const d=await r.json(); if(!r.ok)return alert("خطأ");
+    setUser(d); close("authModal"); renderUser();
+  }else{
+    if(!name)return alert("اكتب اسم");
+    await fetch("/api/auth/register",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email,password:pass,name})});
+    close("authModal");
+  }
 };
 
-(async function(){
-  await loadCategories();
-  await loadProducts();
-})();
+/* init */
+(async()=>{await loadCategories();await loadProducts()})();
