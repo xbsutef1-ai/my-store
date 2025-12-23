@@ -1,63 +1,109 @@
 import express from "express";
 import mongoose from "mongoose";
-import multer from "multer";
-import path from "path";
-import fs from "fs";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 
+import User from "./models/User.js";
 import Product from "./models/Product.js";
-import Category from "./models/Category.js";
+import Plan from "./models/Plan.js";
+import Key from "./models/Key.js";
+import Order from "./models/Order.js";
 
 const app = express();
 app.use(express.json());
 app.use(express.static("public"));
-app.use("/uploads", express.static("uploads"));
 
-mongoose.connect(process.env.MONGO_URI || "mongodb://127.0.0.1/glom-store")
-  .then(()=>console.log("MongoDB connected"));
+await mongoose.connect(process.env.MONGO_URI);
 
-/* ===== Upload ===== */
-if (!fs.existsSync("uploads/products")) {
-  fs.mkdirSync("uploads/products", { recursive: true });
+const JWT_SECRET = process.env.JWT_SECRET || "glom_secret";
+
+/* ===== AUTH MIDDLEWARE ===== */
+function auth(req, res, next) {
+  const h = req.headers.authorization;
+  if (!h) return res.sendStatus(401);
+  try {
+    req.user = jwt.verify(h.split(" ")[1], JWT_SECRET);
+    next();
+  } catch {
+    res.sendStatus(401);
+  }
 }
 
-const storage = multer.diskStorage({
-  destination: "uploads/products",
-  filename: (_, file, cb) =>
-    cb(null, Date.now() + path.extname(file.originalname))
-});
-const upload = multer({ storage });
+function adminOnly(req, res, next) {
+  if (req.user.role !== "admin") return res.sendStatus(403);
+  next();
+}
 
-/* ===== STORE APIs ===== */
-app.get("/api/categories", async (_, res) => {
-  res.json(await Category.find());
-});
+/* ===== AUTH ROUTES ===== */
+app.post("/api/auth/register", async (req, res) => {
+  const { name, email, password } = req.body;
+  if (!name || !email || !password)
+    return res.status(400).json({ error: "MISSING_FIELDS" });
 
-app.get("/api/products", async (_, res) => {
-  res.json(await Product.find());
-});
+  if (await User.findOne({ email }))
+    return res.status(400).json({ error: "EMAIL_EXISTS" });
 
-/* ===== ADMIN APIs ===== */
-app.post("/api/admin/category", async (req, res) => {
-  const name = req.body.name;
-  const slug = name.toLowerCase().replace(/\s+/g, "-");
-  const cat = await Category.create({ name, slug });
-  res.json(cat);
+  const hash = await bcrypt.hash(password, 10);
+  const user = await User.create({ name, email, password: hash });
+
+  const token = jwt.sign({ id: user._id, role: user.role }, JWT_SECRET);
+  res.json({ token, name: user.name, email: user.email, role: user.role });
 });
 
-app.post("/api/admin/product", upload.single("image"), async (req, res) => {
-  const product = await Product.create({
-    title: req.body.title,
-    description: req.body.description,
-    category: req.body.category,
-    image: "/uploads/products/" + req.file.filename
+app.post("/api/auth/login", async (req, res) => {
+  const { email, password } = req.body;
+  const user = await User.findOne({ email });
+  if (!user) return res.status(400).json({ error: "INVALID" });
+
+  const ok = await bcrypt.compare(password, user.password);
+  if (!ok) return res.status(400).json({ error: "INVALID" });
+
+  const token = jwt.sign({ id: user._id, role: user.role }, JWT_SECRET);
+  res.json({ token, name: user.name, email: user.email, role: user.role });
+});
+
+/* ===== ORDERS ===== */
+app.post("/api/order", auth, async (req, res) => {
+  const { product, plan } = req.body;
+  const order = await Order.create({
+    user: req.user.id,
+    product,
+    plan
   });
-  res.json(product);
+  res.json(order);
 });
 
-app.get("/api/admin/products", async (_, res) => {
-  res.json(await Product.find());
+app.get("/api/my-orders", auth, async (req, res) => {
+  const orders = await Order.find({ user: req.user.id })
+    .populate("product")
+    .populate("plan");
+  res.json(orders);
 });
 
-/* ===== START ===== */
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log("Running on", PORT));
+app.get("/api/admin/orders", auth, adminOnly, async (req, res) => {
+  const orders = await Order.find()
+    .populate("user")
+    .populate("product")
+    .populate("plan");
+  res.json(orders);
+});
+
+/* ===== ORDER APPROVAL ===== */
+app.post("/api/admin/order/:id/approve", auth, adminOnly, async (req, res) => {
+  const order = await Order.findById(req.params.id);
+  const key = await Key.findOne({ plan: order.plan, used: false });
+  if (!key) return res.status(400).json({ error: "NO_KEYS" });
+
+  key.used = true;
+  await key.save();
+
+  order.status = "approved";
+  order.deliveredKey = key.value;
+  await order.save();
+
+  res.json({ ok: true, key: key.value });
+});
+
+app.listen(process.env.PORT || 3000, () =>
+  console.log("Server running")
+);
