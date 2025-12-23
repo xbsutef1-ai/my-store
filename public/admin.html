@@ -1,27 +1,40 @@
 <!DOCTYPE html>
-<html>
+<html lang="ar">
 <head>
   <meta charset="UTF-8">
-  <title>Dashboard</title>
+  <title>Owner Dashboard</title>
+  <link rel="stylesheet" href="/theme.css">
 </head>
 <body>
 
 <script>
   const token = localStorage.getItem("token");
-  const role = localStorage.getItem("role");
+  const role  = localStorage.getItem("role");
 
   if(!token){
-    location.href="/";
+    document.body.innerHTML = `
+      <h2 style="padding:40px">سجّل دخولك أولاً</h2>
+    `;
+    throw new Error("NO_TOKEN");
   }
 
-  if(role!=="admin"){
-    document.body.innerHTML = "<h2>Access denied (Not Admin)</h2>";
+  if(role !== "admin"){
+    document.body.innerHTML = `
+      <h2 style="padding:40px">Access Denied – Not Owner</h2>
+    `;
     throw new Error("NOT_ADMIN");
   }
 </script>
 
-<h1>Dashboard</h1>
-<p>Welcome Admin</p>
+<header>
+  <div class="brand">GLOM <span>Owner</span></div>
+  <button onclick="location.href='/'">Back to Store</button>
+</header>
+
+<main style="padding:30px">
+  <h2>Owner Dashboard</h2>
+  <p>الصفحة ثابتة – ما راح ترجعك المتجر</p>
+</main>
 
 </body>
 </html>
