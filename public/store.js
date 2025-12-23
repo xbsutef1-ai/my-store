@@ -1,5 +1,6 @@
 const userBox = document.getElementById("userBox");
 
+/* ===== USER ===== */
 function setUser(u){
   localStorage.setItem("token", u.token);
   localStorage.setItem("email", u.email);
@@ -21,24 +22,33 @@ function logout(){
   renderUser();
 }
 
+/* ===== Avatar ===== */
 function renderUser(){
   const u = getUser();
   if(!u){
     userBox.innerHTML = `<button onclick="openAuth()">Login</button>`;
     return;
   }
+
+  const letter = (u.name || u.email)[0].toUpperCase();
   userBox.innerHTML = `
-    <span>${u.name}</span>
-    ${u.role==="admin" ? `<button onclick="goAdmin()">Dashboard</button>`:""}
-    <button onclick="logout()">Logout</button>
+    <div style="position:relative">
+      <div class="avatar" onclick="toggleMenu()">${letter}</div>
+      <div id="userMenu" class="userMenu hidden">
+        ${u.role==="admin"
+          ? `<div class="itm" onclick="location.href='/admin.html'">Owner Dashboard</div>`
+          : ``}
+        <div class="itm" onclick="logout()">Logout</div>
+      </div>
+    </div>
   `;
 }
 
-function goAdmin(){
-  location.href="/admin.html";
+function toggleMenu(){
+  document.getElementById("userMenu")?.classList.toggle("hidden");
 }
 
-// ===== AUTH =====
+/* ===== Auth ===== */
 let mode="login";
 
 function openAuth(){
@@ -48,8 +58,10 @@ function openAuth(){
 function switchAuth(){
   mode = mode==="login"?"register":"login";
   document.getElementById("rgName").classList.toggle("hidden", mode!=="register");
-  document.getElementById("authSubmit").innerText =
+  document.getElementById("authTitle").innerText =
     mode==="login"?"Login":"Register";
+  document.getElementById("authSubmit").innerText =
+    mode==="login"?"Login":"Create Account";
 }
 
 async function submitAuth(){
@@ -57,7 +69,10 @@ async function submitAuth(){
   const password = rgPass.value.trim();
   const name = rgName.value.trim();
 
-  const url = mode==="login"?"/api/auth/login":"/api/auth/register";
+  const url = mode==="login"
+    ? "/api/auth/login"
+    : "/api/auth/register";
+
   const body = mode==="login"
     ? { email, password }
     : { email, password, name };
@@ -67,7 +82,6 @@ async function submitAuth(){
     headers:{ "Content-Type":"application/json" },
     body: JSON.stringify(body)
   });
-
   const d = await r.json();
   if(!r.ok){ alert(d.error); return; }
 
