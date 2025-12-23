@@ -1,32 +1,71 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<title>Dashboard</title>
-<link rel="stylesheet" href="/theme.css">
+  <meta charset="UTF-8">
+  <title>GLOM Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/theme.css">
 </head>
 <body>
 
 <script>
-const token = localStorage.getItem("token");
-const role = localStorage.getItem("role");
-if (!token || role !== "admin") location.href = "/";
+  const token = localStorage.getItem("token");
+  const role = localStorage.getItem("role");
+
+  // لو ما فيه توكن: رجع للرئيسية
+  if (!token) location.href = "/";
+
+  // لو مو ادمن: لا ترميه للرئيسية (عشان ما تقول "يرجعني") — اعرض رسالة
+  if (role !== "admin") {
+    document.write(`
+      <div style="padding:20px;max-width:520px;margin:40px auto;background:#120020;border:1px solid #2a0a4a;border-radius:16px">
+        <h2 style="margin:0 0 8px">Access denied</h2>
+        <div style="opacity:.75">حسابك مو Admin. غيّر role إلى admin داخل MongoDB ثم سجل خروج/دخول.</div>
+        <div style="margin-top:14px;display:flex;gap:10px">
+          <button class="btn ghost" onclick="localStorage.clear();location.href='/'">Logout</button>
+          <button class="btn" onclick="location.href='/'">رجوع</button>
+        </div>
+      </div>
+    `);
+    throw new Error("NOT_ADMIN");
+  }
 </script>
 
-<nav class="tabs">
-  <button onclick="showTab('overview')">Overview</button>
-  <button onclick="showTab('orders')">Orders</button>
-</nav>
+<header class="topbar">
+  <div class="brand">GLOM <span>Dashboard</span></div>
+  <div class="top-actions">
+    <button class="btn ghost" onclick="localStorage.clear();location.href='/'">Logout</button>
+  </div>
+</header>
 
-<section id="overview" class="tab">
-  <h2>Dashboard</h2>
-</section>
+<main class="main">
+  <nav style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px">
+    <button class="btn ghost" onclick="showTab('overview')">Overview</button>
+    <button class="btn ghost" onclick="showTab('orders')">Orders</button>
+  </nav>
 
-<section id="orders" class="tab hidden">
-  <h2>Orders</h2>
-  <div id="ordersList"></div>
-</section>
+  <section id="overview" class="tab">
+    <div class="modalBox" style="max-width:900px">
+      <div class="modalTitle">Overview</div>
+      <div class="small">بنكمّل هنا الإحصائيات بعدين (Products / Orders / Revenue)</div>
+    </div>
+  </section>
+
+  <section id="orders" class="tab hidden">
+    <div class="modalBox" style="max-width:900px">
+      <div class="modalTitle">Orders</div>
+      <div id="ordersList" class="small" style="margin-top:10px">Loading...</div>
+    </div>
+  </section>
+</main>
 
 <script src="/admin.js"></script>
+<script>
+  function showTab(id){
+    document.querySelectorAll(".tab").forEach(t=>t.classList.add("hidden"));
+    document.getElementById(id).classList.remove("hidden");
+  }
+</script>
+
 </body>
 </html>
