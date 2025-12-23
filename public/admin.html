@@ -1,26 +1,27 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html>
 <head>
   <meta charset="UTF-8">
   <title>Dashboard</title>
-  <link rel="stylesheet" href="/theme.css">
 </head>
 <body>
 
 <script>
   const token = localStorage.getItem("token");
   const role = localStorage.getItem("role");
+
   if(!token){
     location.href="/";
   }
+
   if(role!=="admin"){
-    document.write("<h2>Access denied (Not Admin)</h2>");
+    document.body.innerHTML = "<h2>Access denied (Not Admin)</h2>";
     throw new Error("NOT_ADMIN");
   }
 </script>
 
-<h1>GLOM Dashboard</h1>
-<p>أنت Admin ✔</p>
+<h1>Dashboard</h1>
+<p>Welcome Admin</p>
 
 </body>
 </html>
