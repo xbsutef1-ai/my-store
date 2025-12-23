@@ -4,41 +4,54 @@
   <meta charset="UTF-8">
   <title>GLOM Store</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <link rel="stylesheet" href="/theme.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
 
+<!-- ================= TOP BAR ================= -->
 <header class="topbar">
   <div class="brand">GLOM <span>Store</span></div>
 
   <div class="top-actions">
     <div id="userBox"></div>
+
     <button class="burger icon-btn" onclick="toggleMenu()">
       <i></i><i></i><i></i>
     </button>
   </div>
 </header>
 
+<!-- ================= SIDE MENU ================= -->
 <aside id="sideMenu" class="sideMenu">
   <div class="sideHead">
     <div class="sideTitle">القوائم</div>
-    <button class="icon-btn" onclick="toggleMenu()"><i class="fa-solid fa-xmark"></i></button>
+    <button class="icon-btn" onclick="toggleMenu()">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
   </div>
-  <div id="categories" class="cats"></div>
+
+  <div id="categories" class="cats">
+    <!-- categories injected by JS -->
+  </div>
 </aside>
 
+<!-- ================= MAIN ================= -->
 <main class="main">
   <div class="hint">إذا ما اخترت قائمة ➜ تظهر كل المنتجات</div>
   <section id="products" class="grid"></section>
 </main>
 
-<!-- Checkout -->
+<!-- ================= CHECKOUT ================= -->
 <div id="checkoutModal" class="modal hidden">
   <div class="modalBox">
     <div class="modalHead">
       <div class="modalTitle">Checkout</div>
-      <button class="icon-btn" onclick="closeModal('checkoutModal')"><i class="fa-solid fa-xmark"></i></button>
+      <button class="icon-btn" onclick="closeModal('checkoutModal')">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
     </div>
 
     <div class="coRow">
@@ -72,12 +85,14 @@
   </div>
 </div>
 
-<!-- Proof -->
+<!-- ================= PROOF ================= -->
 <div id="proofModal" class="modal hidden">
   <div class="modalBox">
     <div class="modalHead">
       <div class="modalTitle">رفع إثبات التحويل</div>
-      <button class="icon-btn" onclick="closeModal('proofModal')"><i class="fa-solid fa-xmark"></i></button>
+      <button class="icon-btn" onclick="closeModal('proofModal')">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
     </div>
 
     <div class="bankBox" id="bankBox"></div>
@@ -88,19 +103,21 @@
     </div>
 
     <input id="prRef" class="inp" placeholder="رقم العملية / المرجع">
-    <input id="prUrl" class="inp" placeholder="رابط صورة الإثبات (Imgur/Discord CDN...)">
+    <input id="prUrl" class="inp" placeholder="رابط صورة الإثبات">
 
     <button class="btn" onclick="sendProof()">إرسال الإثبات</button>
     <div class="small" id="prMsg"></div>
   </div>
 </div>
 
-<!-- Auth Modal -->
+<!-- ================= AUTH ================= -->
 <div id="authModal" class="modal hidden">
   <div class="modalBox authBox">
     <div class="modalHead">
       <div class="modalTitle" id="authTitle">تسجيل الدخول</div>
-      <button class="icon-btn" onclick="closeModal('authModal')"><i class="fa-solid fa-xmark"></i></button>
+      <button class="icon-btn" onclick="closeModal('authModal')">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
     </div>
 
     <input id="rgName" class="inp hidden" placeholder="اسم الحساب">
@@ -116,12 +133,14 @@
   </div>
 </div>
 
-<!-- Verify -->
+<!-- ================= VERIFY ================= -->
 <div id="verifyModal" class="modal hidden">
   <div class="modalBox authBox">
     <div class="modalHead">
       <div class="modalTitle">Verify Email</div>
-      <button class="icon-btn" onclick="closeModal('verifyModal')"><i class="fa-solid fa-xmark"></i></button>
+      <button class="icon-btn" onclick="closeModal('verifyModal')">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
     </div>
 
     <div class="small">أدخل رمز التحقق المرسل إلى بريدك</div>
@@ -129,14 +148,21 @@
 
     <button class="btn" onclick="verifyAccount()">تأكيد</button>
     <button class="btn ghost" onclick="resendCode()">إعادة إرسال الرمز</button>
+
     <div class="small" id="vfMsg"></div>
   </div>
 </div>
 
+<!-- ================= SCRIPTS ================= -->
 <script src="/store.js"></script>
 <script>
-function toggleMenu(){ document.getElementById("sideMenu").classList.toggle("show"); }
-function closeModal(id){ document.getElementById(id).classList.add("hidden"); }
+  function toggleMenu(){
+    document.getElementById("sideMenu").classList.toggle("show");
+  }
+  function closeModal(id){
+    document.getElementById(id).classList.add("hidden");
+  }
 </script>
+
 </body>
 </html>
