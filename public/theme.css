@@ -1,67 +1,120 @@
-:root{
-  --bg: radial-gradient(circle at top,#1a0035,#060010 70%);
-  --card: linear-gradient(180deg,#170028,#0b0014);
-  --border:#3b1a6a;
-  --purple:#b66bff;
-  --text:#eee;
-  --muted:rgba(255,255,255,.7);
-  --glow: rgba(182,107,255,.45);
+body{
+  background:#0b0014;
+  color:#fff;
+  font-family:Tahoma, Arial;
+  margin:0;
 }
 
-*{margin:0;padding:0;box-sizing:border-box;font-family:"Segoe UI","Tajawal",sans-serif}
-body{min-height:100vh;background:var(--bg);color:var(--text);overflow-x:hidden}
-
-/* Topbar */
+/* ================= TOP BAR ================= */
 .topbar{
-  position:sticky;top:0;z-index:50;
-  display:flex;align-items:center;justify-content:space-between;
-  padding:16px 22px;
-  background:linear-gradient(180deg,rgba(26,0,53,.92),rgba(6,0,16,.92));
-  border-bottom:1px solid var(--border);
-  backdrop-filter: blur(12px);
+  padding:18px 30px;
+  background:#12001f;
+  border-bottom:1px solid #3b1a6a;
 }
-.brand{font-weight:900;font-size:22px;letter-spacing:.6px}
-.brand span{color:var(--purple)}
-.top-actions{display:flex;align-items:center;gap:12px}
-.icon-btn{background:none;border:none;color:#fff;cursor:pointer;font-size:18px}
-
-.burger i{display:block;width:22px;height:2px;background:#fff;margin:4px 0}
-
-/* Side Menu */
-.sideMenu{
-  position:fixed;top:0;right:-290px;width:290px;height:100%;
-  background:#0b0014;border-left:1px solid var(--border);
-  padding:18px;transition:.28s ease;z-index:100;
+.brand-title{
+  font-size:22px;
+  font-weight:bold;
 }
-.sideMenu.show{right:0}
-.sideHead{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-.sideTitle{font-weight:800;color:var(--purple)}
-.cats{display:flex;flex-direction:column;gap:10px}
-.catBtn{
-  text-align:right;
-  background:rgba(255,255,255,.03);
-  border:1px solid rgba(182,107,255,.22);
-  color:#fff;padding:12px;border-radius:12px;cursor:pointer;
-  transition:.18s ease;
+.brand-title span{
+  color:#b66bff;
 }
-.catBtn:hover{box-shadow:0 0 22px var(--glow);transform:translateY(-1px)}
-.catBtn.active{border-color:var(--purple);box-shadow:0 0 22px var(--glow)}
 
-/* Main */
-.main{padding:22px}
-.hint{opacity:.7;margin-bottom:14px;font-size:13px}
+/* ================= LAYOUT ================= */
+.container{
+  padding:30px;
+  max-width:1200px;
+  margin:auto;
+}
 
-/* Grid */
-.grid{
+/* ================= SEARCH ================= */
+.search-input{
+  width:100%;
+  padding:14px;
+  border-radius:10px;
+  border:none;
+  background:#160026;
+  color:#fff;
+  margin-bottom:18px;
+}
+
+/* ================= CATEGORIES ================= */
+.categories{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-bottom:20px;
+}
+.cat{
+  padding:8px 14px;
+  border-radius:20px;
+  border:1px solid #3b1a6a;
+  cursor:pointer;
+  font-size:14px;
+}
+.cat.active{
+  background:#9b59ff;
+  border-color:#9b59ff;
+}
+
+/* ================= PRODUCTS GRID ================= */
+.products{
   display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
-  gap:18px;
+  grid-template-columns:repeat(auto-fill,minmax(240px,1fr));
+  gap:22px;
 }
 
-/* Card */
-.card{
-  position:relative;
-  background:var(--card);
+/* ================= PRODUCT CARD ================= */
+.product-card{
+  background:#140022;
+  border:1px solid #3b1a6a;
+  border-radius:14px;
+  padding:15px;
+  opacity:0;
+  transform:translateY(20px);
+}
+.product-card img{
+  width:100%;
+  border-radius:10px;
+}
+
+/* ================= BUTTON ================= */
+.btn{
+  background:#9b59ff;
+  border:none;
+  padding:10px 16px;
+  border-radius:10px;
+  color:#fff;
+  cursor:pointer;
+  margin-top:10px;
+}
+.btn:hover{
+  background:#b47cff;
+}
+
+/* ================= ANIMATION ================= */
+.product-card.animate{
+  animation:fadeUp .6s ease forwards;
+}
+@keyframes fadeUp{
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
+/* ================= DISCORD SUPPORT ================= */
+.discord-btn{
+  position:fixed;
+  bottom:20px;
+  right:20px;
+  background:#5865F2;
+  padding:14px 22px;
+  border-radius:30px;
+  color:#fff;
+  text-decoration:none;
+  font-weight:bold;
+  box-shadow:0 0 20px rgba(88,101,242,.6);
+}
   border:1px solid rgba(182,107,255,.18);
   border-radius:18px;
   overflow:hidden;
