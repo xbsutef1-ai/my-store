@@ -3,8 +3,8 @@ const userBox = document.getElementById("userBox");
 function setUser(u){
   localStorage.setItem("token", u.token);
   localStorage.setItem("email", u.email);
-  localStorage.setItem("name", u.name || "");
-  localStorage.setItem("role", u.role || "user");
+  localStorage.setItem("name", u.name);
+  localStorage.setItem("role", u.role);
   renderUser();
 }
 
@@ -24,45 +24,38 @@ function logout(){
 function renderUser(){
   const u = getUser();
   if(!u){
-    userBox.innerHTML = `
-      <button class="btn ghost" onclick="openAuth()">Login</button>
-    `;
+    userBox.innerHTML = `<button onclick="openAuth()">Login</button>`;
     return;
   }
-  const letter = (u.name || u.email)[0].toUpperCase();
   userBox.innerHTML = `
-    <div style="position:relative">
-      <div class="avatar" onclick="toggleMenu()">${letter}</div>
-      <div id="uMenu" class="userMenu hidden">
-        ${u.role==="admin"?`<div class="itm" onclick="location.href='/admin.html'">Dashboard</div>`:""}
-        <div class="itm" onclick="logout()">Logout</div>
-      </div>
-    </div>
+    <span>${u.name}</span>
+    ${u.role==="admin" ? `<button onclick="goAdmin()">Dashboard</button>`:""}
+    <button onclick="logout()">Logout</button>
   `;
 }
 
-function toggleMenu(){
-  document.getElementById("uMenu")?.classList.toggle("hidden");
+function goAdmin(){
+  location.href="/admin.html";
 }
 
-let mode = "login";
+// ===== AUTH =====
+let mode="login";
+
 function openAuth(){
   document.getElementById("authModal").classList.remove("hidden");
 }
-function closeAuth(){
-  document.getElementById("authModal").classList.add("hidden");
-}
+
 function switchAuth(){
   mode = mode==="login"?"register":"login";
   document.getElementById("rgName").classList.toggle("hidden", mode!=="register");
+  document.getElementById("authSubmit").innerText =
+    mode==="login"?"Login":"Register";
 }
 
 async function submitAuth(){
-  const email = rgEmail.value.trim().toLowerCase();
+  const email = rgEmail.value.trim();
   const password = rgPass.value.trim();
   const name = rgName.value.trim();
-
-  if(!email || !password) return alert("Missing");
 
   const url = mode==="login"?"/api/auth/login":"/api/auth/register";
   const body = mode==="login"
@@ -74,11 +67,12 @@ async function submitAuth(){
     headers:{ "Content-Type":"application/json" },
     body: JSON.stringify(body)
   });
+
   const d = await r.json();
-  if(!r.ok) return alert(d.error || "FAILED");
+  if(!r.ok){ alert(d.error); return; }
 
   setUser(d);
-  closeAuth();
+  document.getElementById("authModal").classList.add("hidden");
 }
 
 renderUser();
